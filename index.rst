@@ -1,5 +1,5 @@
 
-.. image:: images/pd_front_image.png
+.. image:: images/slide8.png
    :align: center
 
 
@@ -16,11 +16,11 @@ Slack Group: https://desikasgroupofawesome.slack.com
 
 HiPerGator resources: https://help.rc.ufl.edu/doc/Getting_Started
 
-Caesar docs: caesar.readthedocs.org
+Caesar docs: https://caesar.readthedocs.org
 
-powderday docs: powderday.readthedocs.org
+powderday docs: https://powderday.readthedocs.org
 
-SIMBA website: simba.roe.ac.uk
+SIMBA website: https://simba.roe.ac.uk
 
 
 
