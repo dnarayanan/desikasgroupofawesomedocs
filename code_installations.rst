@@ -49,14 +49,7 @@ then in your .bashrc set the analog to::
 
 python fsps::
 
-
-  >CC=icc F90=ifort F77=ifort python setup.py install
-
-then in your .bashrc set the analog to::
-  
-  >export SPS_HOME=$HOME/python-fsps/src/fsps/libfsps
-
-  >CC=gcc F90=gfortran F77=gfortran python setup.py install
+>CC=gcc F90=gfortran F77=gfortran python setup.py install
 
 
 
