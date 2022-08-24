@@ -106,6 +106,6 @@ Run this and we should have a new IC that is ready for Arepo as well!
 Run Time
 -----------------
 
-You can find exmaples of the parameter files in the GitHub subdirectory idealized_repo_example or at::
+You can find examples of the parameter files in the GitHub subdirectory idealized_repo_example or at::
 
   /blue/narayanan/desika.narayanan/arepo_runs/idealized/MW_ultra_lowres
