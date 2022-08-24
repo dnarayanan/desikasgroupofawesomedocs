@@ -48,11 +48,48 @@ script that calls arepo from the arepo_addbg directory.  Note, you'll
 need a working executable for arepo in that directory.  There are
 param files that are necessary for adding the background -- these
 parameter files will have the params you'll use at simulation runtime,
-and there are exmaples in::
+and there are examples in::
 
   /blue/narayanan/desika.narayanan/MakeGalaxy/arepo_addbg
 
-as well as the GitHub repo.  When you run this background addition, it
+as well as the GitHub repo.  An example of this .sh file (for posterity) is::
+
+  (pd4env_gcc) [desika.narayanan@login2 MakeGalaxy]$ more sbatch_makeIC.sh
+  #!/bin/bash
+  #SBATCH --job-name=makeIC
+  #SBATCH --mail-type=ALL
+  #SBATCH --mail-user=desika.narayanan@gmail.com
+  #SBATCH --time=6:00:00
+  #SBATCH --nodes=1
+  #SBATCH --tasks-per-node=8
+  #SBATCH --ntasks-per-socket=8
+  #SBATCH --cpus-per-task=1
+  #SBATCH --distribution=cyclic:cyclic
+  #SBATCH --mem-per-cpu=8gb
+  #SBATCH --partition=hpg2-compute
+  #SBATCH --account=narayanan
+  #SBATCH --qos=narayanan-b
+
+  
+  module purge
+  #module load ddt/18.0.2
+  module load intel/2018
+  module load gsl
+  module load openmpi/3.1.2
+  module load hdf5
+  #module load grackle
+  
+  DATADIR=$SLURM_SUBMIT_DIR
+  
+  export OMPI_MCA_pml="ucx"
+  export OMPI_MCA_btl="^vader,tcp,openib"
+  export OMPI_MCA_oob_tcp_listen_mode="listen_thread"
+  
+  srun --mpi=pmix_v2     ./arepo_addbg/Arepo   arepo_addbg/param_MW_ultra_lowres.txt 0        1> output_makeIC/OUTPUT  2> output_makeIC/ERROR
+
+
+
+When you run this background addition, it
 will automatically make a new file that has the appendate
 "--with-grid.hdf5".  For example if your input file was called
 "MW_lr.dat", your output file (assuming output type 3 is used) will be
