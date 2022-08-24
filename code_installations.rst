@@ -224,7 +224,9 @@ The current (as of August, 2022) best set of modules to compile AREPO are::
   module load gsl/2.4
   module load fftw/3.3.7
 
+and then::
 
+  make build
 
 GIZMO
 ============
