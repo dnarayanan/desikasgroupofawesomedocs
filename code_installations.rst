@@ -211,4 +211,20 @@ then fix import six line in the equivalent of all of these::
 
 Caesar on HiPerGator
 ============
-	    
+
+
+AREPO
+============
+
+The current (as of August, 2022) best set of modules to compile AREPO are::
+
+  module purge
+  module load intel/2018.1.163
+  module load openmpi/3.1.2
+  module load gsl/2.4
+  module load fftw/3.3.7
+
+
+
+GIZMO
+============
