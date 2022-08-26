@@ -39,6 +39,7 @@ Contents:
    hipergator.rst
    code_installations.rst
    running_galaxy_simulations.rst
+   intro_to_hpg.rst
    caesar.rst
    slick.rst
    
