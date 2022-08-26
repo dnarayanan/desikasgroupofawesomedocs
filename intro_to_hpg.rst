@@ -20,7 +20,9 @@ duler that is in charge of allocating users' jobs to the CPUs available. This sc
 
 Accessing Hipergator
 ============
+
 To access hipergator from your computer, open a terminal and enter::
+
   ssh hpg2.rc.ufl.edu gatorlinkid
 
 This will log you into hipergator and set you on a 'login node.' As stated above, you should not run any code on a login node. But you can do any other things like navigate through your directories, write small data like python scripts or text files, etc. Anything that takes CPU power/IO will need to be done on a compute node. We'll talk about how to get to one of those later. 
@@ -46,7 +48,7 @@ The trade offs of the two queues come from how to use each. The investment queue
 In general, the rule of thumb is that investment cores will start much more quickly than burst cores, but are of course more limited.  We suggest using investment sparingly: for getting interactive/debugging jobs, or for small jobs that are being tested that need to be turned around relatively quickly for debugging.
 
 
-If you need more than $\sim 100$ investment cores, please check in the #general channel in slack to see if it's okay.
+If you need more than ~100 investment cores, please check in the #general channel in slack to see if it's okay.
 
 
 Storage Space
@@ -103,7 +105,7 @@ To submit the job script for the code above, run the command::
 
 This will send the job to SLURM, which will figure out where/when this request can fit in with everyone else's job requests. In contrast to running code interactively, submitting jobs to SLURM means your code will run completely remotely (i.e., once you submit, you don't have to stay on HPG until it finishes).
 
-Submitting SLURM Jobs
+Checking SLURM Job Status
 -----------------
 
 To check the status of any jobs you have currently in queue, you can run the command::
