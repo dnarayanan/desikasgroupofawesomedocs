@@ -2,7 +2,7 @@ Running POWDERDAY Simulations
 **********
 
 Is POWDERDAY Working?
-========
+============
 
 First, if you have not already, you'll need to verify that your POWDERDAY is working properly.
 To do so, follow the checks at the POWDERDAY installation docs (https://powderday.readthedocs.io/en/latest/).
@@ -31,7 +31,7 @@ Filtering Galaxies
 -----------------
 
 At this point, you hopefully have a CAESAR file to reference for galaxies for the appropriate snapshots.
- If not, refer to the CAESAR docs (https://caesar.readthedocs.io/en/latest/) for how to get that done.
+If not, refer to the CAESAR docs (https://caesar.readthedocs.io/en/latest/) for how to get that done.
 The first thing you will want to do is filter the galaxy or galaxies you would like to run POWDERDAY on. 
 This essentially entails extracting the star and gas particles from full simulation that are associated with the galaxy and copying them over to a new file with only those particles.
 This has a few very useful benefits; (1) the file sizes become significantly smaller by virtue of only needing the 
@@ -42,7 +42,7 @@ which will make it much faster to load everything and easier to not hog group sp
 The key script for filtering SIMBA simulations is (unsurprisingly) ``filter_simba.py``. This script is built to filter a single galaxy. You'll need to provide it inline with the
 path to the complete set of snapshots (i.e. the full simulation snapshot at a specific time), the specific snapshot you want, the specific galaxy number you want, and where to store
 the resulting filtered galaxy (this should always be somewhere in your folder on the group's ``/orange/narayanan/`` drive). Notably, you may also need to modify the default CAESAR
- file location if you don't want to draw from the old galaxy catalogs. My (Dhruv's) current version of the script, ``/home/d.zimmerman/sl_simulation_tools/filter_simba_all.py`` 
+file location if you don't want to draw from the old galaxy catalogs. My (Dhruv's) current version of the script, ``/home/d.zimmerman/sl_simulation_tools/filter_simba_all.py`` 
 has been modified to filter all the galaxies from a particular snapshot. Without the noise in the script, the essential parts of it look like this::
 
 	import h5py
@@ -110,8 +110,7 @@ Galaxy Positions
 
 The next, relatively minor, part of the setup process requires running the ``galaxy_positions.py`` script. The purpose of this script is to use the
 newly generated filtered snapshots and simply generate a list of the positions of the center of the galaxies.
-Again, Dhruv's current version looks like this:
-
+Again, Dhruv's current version looks like this::
 
 	import h5py
 	import numpy as np
