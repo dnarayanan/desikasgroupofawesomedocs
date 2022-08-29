@@ -43,7 +43,7 @@ Queues
 
 To run code, we use the nodes/CPUs described above. But we (unfotunately) don't have access to all CPUs on HPG at once. Our group has priority access to 950 CPUs and shared access (i.e. we have to wait in line for it) to 8550 CPUs. These two "queues" (known as Quality of Service [QOS] in HPG/SLURM lingo) are called ``narayanan`` and ``narayanan-b``.  The former represents our investment queue and the latter is our burst queue. You'll specify which queue to submit your jobs to in your SLURM command/script, which we'll go over shortly. 
 
-The trade offs of the two queues come from how to use each. The investment queue is like fast pass at Disney World: time to get requested cores is much shorter than burst and we can occupy them for mnuch longer, but we have a limited number of cores (for the record, I've never actually gotten a fast pass at the one time I was at Disney World so maybe this analogy falls flat). The time we can use the cores is dependent on which allocation we request them from: we can use investment queue cores for 30 days while burst queue jobs can only run for 4 days. 
+The trade offs of the two queues come from how to use each. The investment queue is like fast pass at Disney World: time to get requested cores is much shorter than burst and we can occupy them for much longer, but we have a limited number of cores (for the record, I've never actually gotten a fast pass at the one time I was at Disney World so maybe this analogy falls flat). The time we can use the cores is dependent on which allocation we request them from: we can use investment queue cores for 30 days while burst queue jobs can only run for 4 days. 
 
 In general, the rule of thumb is that investment cores will start much more quickly than burst cores, but are of course more limited.  We suggest using investment sparingly: for getting interactive/debugging jobs, or for small jobs that are being tested that need to be turned around relatively quickly for debugging.
 
@@ -113,5 +113,13 @@ To check the status of any jobs you have currently in queue, you can run the com
   squeue -u your_gator_login_name
 
 which will display all jobs submitted to queue, either running or awaiting allocation, separated by which queue (investment or burst) you submitted to. You can also use the command 'slurmInfo -u narayanan' to check the entire group's cumulative CPU usage, but you'll need to module load ``ufrc`` beforehand.
+
+You can see what jobs you (and the entire group) have in queue, and what QOS they've been submitted to using::
+
+  showq -A narayanan
+
+If you find that your jobs are sitting in queue for longer than you
+expect, and not getting anywhere, check the 'reason' against this
+glossary: https://help.rc.ufl.edu/doc/Why_is_my_job_not_running
 
 
