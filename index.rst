@@ -40,7 +40,7 @@ Contents:
    code_installations.rst
    running_galaxy_simulations.rst
    intro_to_hpg.rst
-   caesar.rst
-   slick.rst
+   using_major_group_codes.rst
+   common_software_tools.rst
    
 
