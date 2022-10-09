@@ -1,13 +1,47 @@
-Using Major Group Codes
+Major Codes Used by our Group
 **********
+
+Note --- some of these may be developed by our group, and some may
+have authors outside our group.  What follows is a quick instruction
+manual for any of these codes to get started quickly.  This is not
+intended to be a substitute for the main code manuals/websites, though
+those are documented below as well.
+
+
+
+Prospector
+============
+
+
+
 
 
 Slick (including Despotic)
 ============
 
+Overview
+------------------
+
+The main public repository and manual is here:
+
+https://github.com/karolinagarcia/slick
+
 
 Installing DESPOTIC
 -------------------
+
+DESPOTIC is written and maintained by Mark Krumholz (ANU), with code
+paper, repository, and manual here.  It is a fairly extensive and
+powerful code, and we recommend you read through the examples that
+ship with DESPOTIC to have at least a surface-level understanding of
+the code before embarking on SLICK.
+
+https://bitbucket.org/krumholz/despotic
+
+https://ui.adsabs.harvard.edu/abs/2014MNRAS.437.1662K/abstract
+
+
+
 Clone the DESPOTIC repository if you haven't already::
 
   >cd $HOME
