@@ -41,8 +41,49 @@ https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.h
 
 Tmux
 ============
+Tmux stands for the terminal multiplexer. Don't worry about the fancy terminology. The main use of tmux for us at least is to keep the single/multiple terminal sessions running even after you log out from hipergator. To load tmux just do::
+
+    	module load tmux
+
+and to start a tmux session just type:: 
+
+    	tmux
+    
+This will start a tmux session which will look like a new terminal window. You can run your codes in this window and they will keep running even after you log out from hipergator. Once you have your code running, you can exit the tmux window by hitting::
+
+  	ctrl–b–d
+	
+To list all the tmux sessions you have runnning use tmux ls and to open an existing tmux session use:: 
+
+	tmux attach -t session-name
 
 
+Keep in mind that you cannot scroll by default inside a tmmux session. To scroll you must hit::
+	
+	ctrl–b–[
+	
+to go into scrolling mode. To get out of it just hit *q*
+	
+A list of the most useful tmux commands can be found here: https://danielmiessler.com/study/tmux/
+
+One common use for tmux sessions is to ask for a development node inside a tmux session. You can do so via::
+
+	srun --pty --partition=hpg-dev --time=10:00:00 --nodes=1 --ntasks=10  --mem=60gb --qos=narayanan bash -i
+	
+Once the node is allocated you can close the tmux session and then you can access this node anywhere using::
+	
+	ssh -XC \$(squeue -u $USER -n bash --states=R --noheader --Format=nodelist | head -n1)
+	
+It is recommended to alias the above two commands in your .bashrc file. This can be done by adding::
+
+	alias devnode="ssh -XC \$(squeue -u $USER -n bash --states=R --noheader --Format=nodelist | head -n1)"
+	alias dev='srun --pty --partition=hpg-dev --time=10:00:00 --nodes=1 --ntasks=10  --mem=60gb --qos=narayanan bash -i'
+	
+to your .bashrc file which can be found in your home directory. Once you have edited the bashrc file type::
+
+	source .bashrc
+	
+to reload the .bashrc file and now you should be able access these commands just by using their aliases. This can be done for any commands you frequently use.
 
 Git
 ============
