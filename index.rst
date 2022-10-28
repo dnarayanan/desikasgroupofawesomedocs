@@ -42,5 +42,5 @@ Contents:
    intro_to_hpg.rst
    using_major_group_codes.rst
    common_software_tools.rst
-   
+   generating_sfhs_from_snapshots.rst
 
