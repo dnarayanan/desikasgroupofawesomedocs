@@ -1,5 +1,9 @@
-Generating Star Formation Histories from Snapshot Data
+Analysis Procedures
 **********
+
+
+Generating SFHs from Snapshots
+============
 
 (so far) There's two ways of calculating the star formation rate for simba galaxies which differ by the timescales the SFR is averaged over. The SFR calculated by caesar for galaxies is based on the current rate of star formation of the gas particles. This is an instantaneous measure of SFR -- literally, how many stars are being produced from gas particles at the moment the snapshot is written. A more general way to quantify the SFR is by averaging the stellar mass produced over some time period. This is more akin to the SFR that observers measure from galaxies, either by relating emission line luminosities to the SFR or by modeling galaxy SEDs with a SFH. Caesar does not currently calculate this SFR for us so I've written a script to do just that. 
 
@@ -28,4 +32,5 @@ The list output from the above script is not immediately useful, as we need to b
 
 
 The good thing about binning this way is that we don't have to re-run FSPS everytime we want a differently sampled SFH -- just choose a different bin size!
+
 
