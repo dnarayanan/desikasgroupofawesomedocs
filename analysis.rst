@@ -12,7 +12,7 @@ The basic idea of the script is to take all the star particles for a particular 
 The output of this script is an object containing the formation times and initial masses of each star particle in the galaxy/galaxies of interest. To turn this into a SFH, I use a binning function from scipy that returns the SFR in arbitrary spaced bins; this allows us to make SFHs/calculate the recent SFR over whatever timescales we want. 
 
 SFH Script
-============
+--------------
 
 The script I use for generating SFHs for simba (or any cosmo sim), using FSPS to calculate the initial star particle masses, can be found at this link::
   
@@ -24,7 +24,7 @@ The output is a pickled object containing a list of galaxy IDs and those galaxie
 
 
 Binning and plotting the SFH
-============
+--------------
 
 The list output from the above script is not immediately useful, as we need to bin those masses according to their formation times to get the SFH. This can be done tons of ways but the easiest (at least to me) way is using the scipy binned_statistic function. The code is (thankfully) documented a bit so it should be straightfoward::
 
