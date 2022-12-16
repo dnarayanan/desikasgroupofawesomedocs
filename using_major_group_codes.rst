@@ -65,7 +65,9 @@ With the dependencies installed, Prospector can now be cloned and installed::
 
 It also has a pretty decent demo on how to use prospector: https://github.com/bd-j/prospector/blob/main/demo/InteractiveDemo.ipynb
 
+
 For visualization purposes, we'll also want to install 2 packages: corner, which helps us plot corner plots::
+
   >cd $HOME               
   >git clone https://github.com/dfm/corner.py.git
   >cd corner

@@ -16,7 +16,7 @@ SED modeling basically entails mapping the observed light of a galaxy at differe
 To model a galaxy spectrum and infer the galaxy's properties, there's a bunch of assumptions we have to make about how and when the stars formed in a galaxy (the star formation history), how much and what kind of dust is in that galaxy (dust attenuation and emisision), the properties of regions like HII nebulae and AGN. For the purposes of this tutorial, we're going to focus on just the components pertaining to stars and dust. Below is a great summary figure from Charlie Conroy's 2013 review article on the technique of modeling stellar populations. 
 
 .. image:: conroy_2013.png
-:width: 600
+	   :width: 600
 
 
 Modeling Stellar Populations
