@@ -41,6 +41,7 @@ Contents:
    running_galaxy_simulations.rst
    intro_to_hpg.rst
    using_major_group_codes.rst
+   seds_with_prospector.rst
    common_software_tools.rst
    analysis.rst
 
