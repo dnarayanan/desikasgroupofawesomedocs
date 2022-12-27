@@ -9,7 +9,13 @@ Initial Conditions With MUSIC
 -----------------
 
 The very first thing we'll need to do is to set up initial conditions
-with MUSIC (https://www-n.oca.eu/ohahn/MUSIC/).  For MUSIC, you'll
+with MUSIC (https://www-n.oca.eu/ohahn/MUSIC/).  Please note: the
+following instructions for MUSIC are for a non-zoom in cosmological
+simulation only.  Please see below for initial conditions generation
+for cosmological zoom in simulations.
+
+
+For MUSIC, you'll
 need a few libraries (compiler, GSL and FFTW loaded at the least).  I
 suggest having your flags and paths set in the compiler as something
 like::
@@ -284,11 +290,69 @@ example from one of Sidney's zooms::
   srun --mpi=pmix_v2  GIZMO $DATADIR/ml11_zoom_param_files/run31_halo0_ml11.param
   
 
-
+Compiling Arepo
+-----------------
+[Fill in instructions for how to compile arepo]
 
 
 Cosmological Simulations (Zoom-in)
 ============
+
+Running a cosmological zoom-in simulation is more or less the same as
+a large box simulation, though with one major difference: the IC file
+created by music is rather different.  As a summary: For a zoom-in
+simulation, we want to have first run a large box low-resolution dark
+matter only simulation.  From that large box simulation, we then
+identify a halo with Caesar that we want to "zoom-in" on.  With
+Caesar, we will create a 'mask' around this halo which identifies
+region we want to re-simulate at high resolution.  This information is
+then fed into MUSIC which will split the particles that are in this
+high resolution mask N times (in order to obtain a desired particle
+resolution), and everything outside of this mask (from the parent DM
+only large box simulation) will remain at low-resolution.  This allows
+us to capture large scale torques/gravitational effects on the zoom
+galaxy of interest, while maintaining high particle resolution within
+the zoomed-in halo.  
+
+To write the mask, we will use CAESAR in the following manner::
+
+  import numpy as np
+  import caesar,yt
+  
+  #modeled after /orange/narayanan/s.lower/simba/m25n256_dm/zooms/halo_masks/write_halo_mask.py
+  
+  snapshot = '/orange/narayanan/s.lower/simba/m25n256_dm/output/run1/snapshot_008.hdf5'
+  icfile = '/orange/narayanan/s.lower/simba/m25n256_dm/IC_stuff/run1_ICs/ics_m25n256_Run1.0'
+  caesarfile = '/orange/narayanan/s.lower/simba/m25n256_dm/output/run1/Groups/caesar_snapshot_008.hdf5'
+  halonum =0
+  
+  outfile = 'run1_halo0.mask.txt'
+  
+
+  obj = caesar.load(caesarfile)
+  ic = icfile
+  ds = yt.load(snapshot)
+  ic_ds = yt.load(ic)
+  obj.yt_dataset = ds
+  obj.halos[halonum].write_IC_mask(ic_ds,outfile,radius_type='total_half_mass')
+
+  
+Where icfile is the initial conditions MUSIC file from the parent dark
+matter only simulation, and the snapshot is the snapshot we're
+building the zoom from.  This snapshot should represent the latest
+possible redshift you are interested in running the zoom to (since if
+you run past this, then low-res particles will eventually fall into
+the halo and contaminate it).  There's an art to choosing this final
+redshift: you obviously don't want to short change yourself and pick a
+final redshift that's too large, only to wish you could run your zoom
+further.  At the same time, the lower the redshift of this final
+snapshot (that we select the halo to resimulate from), the more
+particles there will be in it, and the harder the zoom in simulation
+will be to run.
+
+[more to fill in yet - just a place holder for now]
+
+
 
 Idealized Galaxy Simulations
 ============
