@@ -14,6 +14,10 @@ following instructions for MUSIC are for a non-zoom in cosmological
 simulation only.  Please see below for initial conditions generation
 for cosmological zoom in simulations.
 
+Unfortunately, the IC generation is slightly different for Gizmo vs
+Arepo because why would things be easy.  Where differences exist,
+we'll note them.
+
 
 For MUSIC, you'll
 need a few libraries (compiler, GSL and FFTW loaded at the least).  I
@@ -38,7 +42,7 @@ So that the code automagically looks for whatever is added to your path when you
   module load hdf5
   module load fftw
 
-The next thing you'll need is a configuration file for MUSIC.  Let's
+**GIZMO:** The next thing you'll need is a configuration file for MUSIC.  Let's
 set up a config file for a 25/h Mpc (side-length) and 512^3 (particle number) box.  The config file could look something like this::
 
   [desika.narayanan@login1 ICs]$ pwd
@@ -98,6 +102,18 @@ coordinate system, etc.  The levelmin/max stuff is the particle count
 -- so 9==2^9==512.  Similarly, we set that we want baryons (unless, of
 course, we don't...) and our cosmology.  Important: this cosmology
 will need to be the same as what we use in our actual hydro simulation.
+
+**Arepo:** For Arepo things are slightly different.  Here, Arepo
+ actually adds the baryons itself, so we have to generate a file with
+ no baryons.  This looks different from the aforementioned Gizmo MUSIC
+ IC in the following way::
+
+   baryons			= no
+   format			= arepo_double
+   ##gadget_usekpc		= yes
+   ##gadget_usemsol		= no
+
+ note what is commented out above.
 
 Once this config file is set, we need to actually run MUSIC on the config file to create the IC::
 
@@ -292,7 +308,31 @@ example from one of Sidney's zooms::
 
 Compiling Arepo
 -----------------
-[Fill in instructions for how to compile arepo]
+Arepo is similar to Gizmo with the following updates::
+
+
+  module purge
+  module load intel/2018.1.163
+  module load openmpi/3.1.2
+  module load gsl/2.4
+  module load fftw/3.3.7
+  module list
+
+
+  
+Like with Gizmo you'll need to look at someone else's Config.sh to
+compile to set the correct physics. This said there is one important
+note: to use the MUSIC ICs as described above (with baryons off),
+we'll need this set for sure in the Config.sh::
+  
+  GENERATE_GAS_IN_ICS
+
+Finally to compile, we type::
+  
+  make clean
+  make build
+
+
 
 
 Cosmological Simulations (Zoom-in)
@@ -349,6 +389,20 @@ further.  At the same time, the lower the redshift of this final
 snapshot (that we select the halo to resimulate from), the more
 particles there will be in it, and the harder the zoom in simulation
 will be to run.
+
+There is additionally some art to choosing the radius_type above.  The
+larger the radius_type, the less likely we are to suffer contamination
+down the line.  At the same time, too large of a radius will not only
+slow the simulation down, but we can't have a radius larger than the
+box size or else we'll get the following error from MUSIC::
+
+   - ERROR: On level 9, subgrid is larger than half the box. This is not allowed!
+     terminate called after throwing an instance of 'std::runtime_error'
+     what():  Fatal: Subgrid larger than half boxin zoom.
+     Aborted (core dumped)
+
+The options for radii types for dark halos are printed below (though note the baryon ones won't work if your initial low-res simulation is DM only)::
+  dict_keys(['baryon_half_mass', 'baryon_r20', 'baryon_r80', 'dm_half_mass', 'dm_r20', 'dm_r80', 'total_half_mass', 'total_r20', 'total_r80'])
 
 [more to fill in yet - just a place holder for now]
 
