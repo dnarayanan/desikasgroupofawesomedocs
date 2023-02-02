@@ -94,7 +94,8 @@ Microsoft Virtual Studio Code
 How to use VS Code connected (or not) to HiperGator
 
 Setup
-================
+----------------------------
+
 
 Downloading VS Code
 ----------------------------
@@ -108,7 +109,9 @@ Go to https://code.visualstudio.com/docs/setup/setup-overview. On the left, belo
 
 
 Get started
-================
+
+----------------------------
+
 
 Here are some cool short videos on how to get started on a bunch of thing in VS Code: https://code.visualstudio.com/docs/getstarted/introvideos.
 
@@ -125,7 +128,8 @@ The things that I find most important are accesed from the left hand side option
 
 
 Connecting VS Code to HiperGator
-================
+----------------------------
+
 
 Make VS Code SSH to HPG
 ----------------------------
