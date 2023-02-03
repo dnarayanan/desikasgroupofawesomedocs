@@ -31,6 +31,41 @@ This will log you into hipergator and set you on a 'login node.' As stated above
 Running Code on Hipergator
 ============
 
+Python Anaconda Environments
+-----------------
+
+Generally it's advised to work within individual Anaconda python
+environments on HiPerGator.  The reason is that this allows you to isolate individual code builds, and if something gets screwed up, you can just delete the environment without screwing anything up. The following is taken from:
+
+https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
+https://help.rc.ufl.edu/doc/Conda
+
+To start a new environment::
+
+  module load conda
+  mamba create --p /blue/narayanan/desika.narayanan/conda/envs/myenv python=3.8
+
+this will install the environment in your /blue data directory.  This
+is very important since otherwise these conda environments will blow
+up in space, and eventually use all your home disk space if you
+install it in $HOME.  You can then activate it via::
+
+  ml conda
+  mamba activate /blue/narayanan/desika.narayanan/conda/envs/myenv
+
+which of course you might prefer to put in your .bashrc file as an alias.  For example, mine looks like this::
+
+  alias py38='ml conda; mamba activate /blue/narayanan/desika.narayanan/conda/envs/py38
+
+so that at the linux prompt, I just have to type::
+
+  py38
+
+And it will automagically load my python3.8 environment (note, right
+away we can see the potential of having different environments -- I
+can have different python versions for example, as I test code out, etc.).
+
+
 
 Cluster, Nodes, Partitions, and CPUs
 -----------------
