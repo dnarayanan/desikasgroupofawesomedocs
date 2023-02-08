@@ -459,17 +459,17 @@ as well as the GitHub repo.  An example of this .sh file (for posterity) is::
   #SBATCH --job-name=makeIC
   #SBATCH --mail-type=ALL
   #SBATCH --mail-user=desika.narayanan@gmail.com
-  #SBATCH --time=6:00:00
-  #SBATCH --nodes=1
-  #SBATCH --tasks-per-node=8
-  #SBATCH --ntasks-per-socket=8
+  #SBATCH --time=1:00:00
+  #SBATCH --nodes=8
+  #SBATCH --tasks-per-node=16
+  #SBATCH --ntasks-per-socket=16
   #SBATCH --cpus-per-task=1
   #SBATCH --distribution=cyclic:cyclic
   #SBATCH --mem-per-cpu=8gb
-  #SBATCH --partition=hpg2-compute
-  #SBATCH --account=narayanan
-  #SBATCH --qos=narayanan-b
 
+  #SBATCH --partition=hpg-default
+  #SBATCH --account=narayanan
+  #SBATCH --qos=narayanan
   
   module purge
   #module load ddt/18.0.2
