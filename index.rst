@@ -36,13 +36,14 @@ Contents:
 .. toctree::
    :maxdepth: 0
 
-   hipergator.rst
-   code_installations.rst
-   running_galaxy_simulations.rst
    intro_to_hpg.rst
-   using_major_group_codes.rst
-   seds_with_prospector.rst
+   hipergator.rst
    common_software_tools.rst
+   code_installations.rst
+   using_major_group_codes.rst
+   running_galaxy_simulations.rst
+   running_powderday_simulations.rst
+   seds_with_prospector.rst
    analysis.rst
 
 

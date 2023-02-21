@@ -161,7 +161,322 @@ Again, Dhruv's current version looks like this::
 
 
 
-Getting POWDERDAY to Run on a Single Filtered Galaxy
+Setting up POWDERDAY to Run on Filtered Galaxies
 -----------------
+At this point, hopefully you have successfully filtered the galaxies in your CAESAR file into individual galaxy files and one file storing the center locations of these galaxies. Now you're all set to worry about POWDERDAY. You are currently missing some parameters_model scripts for your POWDERDAY run. To resolve this, there are two important files you'll need to use from https://github.com/smlower/sl_simulation_tools (only one directly) to get all set up: ``powderday_setup.py`` and ``cosmology_setup_all_cluster.hipergator.sh``. The python script will call the bash script with location and temperature information pulled from the simulation. The bash script will automatically generate the parameters model files for you for each galaxy with the given information at the given locations. Dhruv’s current versions of these scripts are as follows::
 
+	# powderday_setup.py
+	#purpose: to set up slurm files and model *.py files from the
+	#positions written by caesar_cosmology_npzgen.py for a cosmological
+	#simulation.  This is written for the University of Florida's
+	#HiPerGator2 cluster.
+	import numpy as np
+	from subprocess import call
+	import sys
+	
+	nnodes=1
+	snap_dict = {'74':6.014,'80':5.530,'87':5.024,'95':4.515,'104':4.015,'115':3.489,'127':3.003,'142':2.496,'160':2.0,'183':1.497,'212':1.007,'252':0.501,'305':0.0} # edit this list as you see fit for the snapshots you use
+	simb_run = "m25n512" # what SIMBA box are you using?
+	snap_num = sys.argv[1] # takes the snapshot as an in-line parameter – important for the bash scripts
+	snap_redshift = snap_dict[snap_num]
+	npzfile = '/orange/narayanan/[…]/snap'+str(snap_num)+'_gal_positions.npz' # where did you put the galaxy positions file?
+	model_dir_base = '/orange/narayanan/[…]' # where do you want your POWDERDAY parameters model files to go?
+	out_dir_base = '/orange/narayanan/[…]’ # where do you want your SED files to go when POWDERDAY is finished?
+	hydro_dir = '/orange/narayanan/[…]' # where are your filtered galaxies?
+	hydro_dir_remote = hydro_dir
+	model_run_name='simba_m25n512' # shorthand for what you are running
+	#################
+	COSMOFLAG=0 #flag for setting if the gadget snapshots are broken up into multiples or not and follow a nomenclature snapshot_000.0.hdf5
+	FILTERFLAG = 1 #flag for setting if the gadget snapshots are filtered or not, and follow a nomenclature galaxy_1800.hdf5 – this can easily be changed if you prefer some other naming convention
+	SPHGR_COORDINATE_REWRITE = True
+	#===============================================
+	if (COSMOFLAG == 1) and (FILTERFLAG == 1):
+    		raise ValueError("COSMOFLAG AND FILTER FLAG CAN'T BOTH BE SET")
+	data = np.load(npzfile,allow_pickle=True)
+	pos = data['pos'][()] #positions dictionary
+	#ngalaxies is the dict that says how many galaxies each snapshot has, in case it's less than NGALAXIES_MAX
+	ngalaxies = data['ngalaxies'][()]
+
+	for snap in [snap_num]: # artifact of old code, does not have to be a loop
+		model_dir = model_dir_base
+		model_dir_remote = model_dir
+		tcmb = 2.73*(1.+snap_redshift) # will be important at higher z
+		NGALAXIES = ngalaxies['snap'+str(snap)]
+		
+		for nh in range(NGALAXIES):
+			try:
+				xpos = pos['galaxy'+str(nh)]['snap'+str(snap)][0] # extra positional information
+			except: continue
+			
+			ypos = pos['galaxy'+str(nh)]['snap'+str(snap)][1]
+			zpos = pos['galaxy'+str(nh)]['snap'+str(snap)][2]
+			#print("CALLING")
+			cmd = "./cosmology_setup_all_cluster.hipergator.sh "+str(nnodes)+' '+model_dir+' '+hydro_dir+' '+out_dir_base+' '+model_run_name+' '+str(COSMOFLAG)+' '+str(FILTERFLAG)+' '+model_dir_remote+' '+hydro_dir_remote+' '+str(xpos)+' '+str(ypos)+' '+str(zpos)+' '+str(nh)+' '+str(snap)+' '+str(tcmb)
+			call(cmd,shell=True) # call the bash script with the calculated numbers as parameters
+        		#print("CALLED")
+
+	# start of bash script
+
+	#!/bin/bash
+
+	#Powderday cluster setup convenience script for SLURM queue manager
+	#on HiPerGator at the University of FLorida.  This sets up the model
+	#files for a cosmological simulation where we want to model many
+	#galaxies at once.
+
+	#Notes of interest:
+
+	#1. This does *not* set up the parameters_master.py file: it is
+	#assumed that you will *very carefully* set this up yourself.
+
+	#2. This requires bash versions >= 3.0.  To check, type at the shell
+	#prompt:
+
+	#> echo $BASH_VERSION
+	# grab the numbers
+	n_nodes=$1
+	model_dir=$2
+	hydro_dir=$3
+	out_dir=$4
+	model_run_name=$5
+	COSMOFLAG=$6
+	FILTERFLAG=$7
+	model_dir_remote=$8
+	hydro_dir_remote=$9
+	xpos=${10}
+	ypos=${11}
+	zpos=${12}
+	galaxy=${13}
+	snap=${14}
+	tcmb=${15}
+
+	echo "processing model file for galaxy,snapshot:  $galaxy,$snap"
+	
+	#clear the pyc files
+	rm -f *.pyc
+
+	#set up the model_**.py file
+	echo "setting up the output directory in case it doesnt already exist"
+	echo "snap is: $snap"
+	echo "model dir is: $model_dir"
+	mkdir $model_dir
+	
+	filem="$model_dir/snap${snap}_galaxy${galaxy}.py"
+	echo "writing to $filem"
+	rm -f $filem
+	
+	# setting up header
+	echo "#Snapshot Parameters" >> $filem
+	echo "#<Parameter File Auto-Generated by setup_all_cluster.sh>" >> $filem
+	echo "snapshot_num =  $snap" >> $filem 
+	echo "galaxy_num = $galaxy" >>$filem
+	echo -e "\n" >> $filem
+
+	echo -e "galaxy_num_str = str(galaxy_num)" >> $filem
+
+	# may need to include depending on how you converted to naming conventions
+	#echo "if galaxy_num < 10:" >> $filem
+	#echo -e "\t galaxy_num_str = '00'+str(galaxy_num)" >> $filem
+	#echo -e "elif galaxy_num >= 10 and galaxy_num <100:" >> $filem
+	#echo -e "\t galaxy_num_str = '0'+str(galaxy_num)" >> $filem
+	#echo -e "else:" >> $filem
+	#echo -e "\t galaxy_num_str = str(galaxy_num)" >> $filem
+	
+	echo -e "\n" >>$filem
+
+	echo -e "snapnum_str = str(snapshot_num)" >> $filem
+
+	echo -e "\n" >>$filem
+	if [ $COSMOFLAG -eq 1 ]
+	then
+    		echo "hydro_dir = '$hydro_dir_remote/snapdir_'+snapnum_str+'/'">>$filem
+    		echo "snapshot_name = 'snapshot_'+snapnum_str+'.0.hdf5'" >>$filem
+	elif [ $FILTERFLAG -eq 1 ] # you’ll be using this 99.9% of the time
+	then
+    		echo "hydro_dir = '$hydro_dir_remote/'">>$filem
+    		echo "snapshot_name = 'galaxy_'+str(galaxy_num)+'.hdf5'">>$filem # change this line for filtered naming conventions
+	else
+    		echo "hydro_dir = '$hydro_dir_remote/'">>$filem
+    		echo "snapshot_name = 'snapshot_'+snapnum_str+'.hdf5'" >>$filem
+	fi
+
+
+	echo -e "\n" >>$filem
+
+	echo "#where the files should go" >>$filem
+	echo "PD_output_dir = '${out_dir}/' ">>$filem # again, where you want things to go
+	echo "Auto_TF_file = 'snap'+snapnum_str+'.logical' ">>$filem # COME BACK
+	echo "Auto_dustdens_file = 'snap'+snapnum_str+'.dustdens' ">>$filem # COME BACK
+
+	echo -e "\n\n" >>$filem 
+	echo "#===============================================" >>$filem
+	echo "#FILE I/O" >>$filem
+	echo "#===============================================" >>$filem
+	echo "inputfile = PD_output_dir+'snap'+snapnum_str+'.galaxy'+galaxy_num_str+'.rtin'" >>$filem
+	echo "outputfile = PD_output_dir+'snap'+snapnum_str+'.galaxy'+galaxy_num_str+'.rtout'" >>$filem
+	echo -e "\n\n" >>$filem
+	echo "#===============================================" >>$filem
+	echo "#GRID POSITIONS" >>$filem
+	echo "#===============================================" >>$filem
+	echo "x_cent = ${xpos}" >>$filem
+	echo "y_cent = ${ypos}" >>$filem
+	echo "z_cent = ${zpos}" >>$filem
+
+	echo -e "\n\n" >>$filem
+	echo "#===============================================" >>$filem
+	echo "#CMB INFORMATION" >>$filem
+	echo "#===============================================" >>$filem
+	echo "TCMB = ${tcmb}" >>$filem
+	# from here we make the job script that you can use
+	echo "writing slurm submission master script file"
+	qsubfile="$model_dir/master.snap${snap}.job"
+	rm -f $qsubfile
+	echo $qsubfile
+	echo "#! /bin/bash" >>$qsubfile
+	echo "#SBATCH --job-name=${model_run_name}.snap${snap}" >>$qsubfile
+	echo "#SBATCH --output=pd.master.snap${snap}.o" >>$qsubfile
+	echo "#SBATCH --error=pd.master.snap${snap}.e" >>$qsubfile
+	echo "#SBATCH --mail-type=ALL" >>$qsubfile
+	echo "#SBATCH --mail-user=[…]@ufl.edu" >>$qsubfile # your email
+	echo "#SBATCH --time=48:00:00" >>$qsubfile
+	echo "#SBATCH --tasks-per-node=32">>$qsubfile
+	echo "#SBATCH --nodes=$n_nodes">>$qsubfile
+	echo "#SBATCH --mem-per-cpu=3800">>$qsubfile
+	echo "#SBATCH --account=narayanan">>$qsubfile
+	echo "#SBATCH --qos=narayanan-b">>$qsubfile
+	echo "#SBATCH --array=0-99">>$qsubfile # preferably modify with a % ‘max number of jobs’ when actually running, job # will correspond to galaxy number in some way
+	echo -e "\n">>$qsubfile
+	echo -e "\n" >>$qsubfile
+
+	# the meat of the job script that actually tells SLURM what to do
+	# get your modules loaded (make sure to modify with your own appropriate ones)
+	echo "cd /home/d.zimmerman">>$qsubfile
+	echo "module purge">>$qsubfile
+	echo "source .bashrc">>$qsubfile
+	echo "source activate master_env">>$qsubfile
+	echo -e "\n">>$qsubfile
+	echo "module load git/2.14.1">>$qsubfile
+	#echo "module load gcc/8.2.0">>$qsubfile
+	echo "module load intel/2018.1.163">>$qsubfile
+	echo "module load openmpi/4.0.3">>$qsubfile
+	echo "module load hdf5/1.10.1">>$qsubfile
+	echo -e "\n">>$qsubfile
+
+	echo "ID=\$(awk '{if(NR==(n+1)) print int(\$0)}' n=\${SLURM_ARRAY_TASK_ID} /orange/narayanan/d.zimmerman/simba/m25n512/snap${snap}/snap${snap}_gas_gals.txt)">>$qsubfile # Something Dhruv has used to only run POWDERDAY on galaxies with gas (you will need to set up the txt file if you want this), important if you are running over many galaxies in a simulation, if not, substitute subsequent ‘ID’ instances with ‘SLURM_ARRAY_TASK_ID’, which is a SLURM variable
+	echo -e "\n">>$qsubfile
+	# calling POWDERDAY
+	echo "cd /home/d.zimmerman/powderday/">>$qsubfile
+	echo "pd_front_end.py $model_dir_remote parameters_master_catalog snap${snap}_galaxy\${ID} > $out_dir/outlogs/snap${snap}_galaxy\${ID}.log">>$qsubfile
+	echo "date"
+
+Doing it All the Setup in One Go
+-----------------
+Dhruv’s modified scripts are constructed and intended so that one can run them for a bunch of snapshots at once given the CAESAR files and intended destinations. If you’re confident that you have the above scripts working all correctly, you can modify the bash scripts below to do everything you want in one go for all snapshots you care about. I would personally recommend filtering separately and then running the POWDERDAY setup as below as filtering will be the majority of the time usage and has different memory requirements, but it should not be a problem to run both as long as you adjust the job parameters appropriately. Note that if you want to use the m100 box, you should also be careful with both memory and time allocations.::
+
+	# start of filter bash script
+
+
+	#!/bin/bash
+	#SBATCH --job-name=simba_filter_array
+	#SBATCH --output=output.log
+	#SBATCH --mail-type=ALL
+	#SBATCH --mail-user=[…]@ufl.edu
+	#SBATCH --ntasks=4
+	#SBATCH --nodes=1
+	#SBATCH --mem=60gb
+	#SBATCH --account=narayanan
+	#SBATCH --qos=narayanan
+	#SBATCH --time=20:00:00
+	#SBATCH --array=[…]
+
+
+	date;hostname;pwd;
+	cd /home/d.zimmerman
+	module purge
+	source .bashrc
+
+	source activate master_env
+
+	module load git/2.14.1
+	#module load gcc/8.2.0
+	module load intel/2018.1.163
+	module load openmpi/4.0.3
+	module load hdf5/1.10.1
+
+	python /home/d.zimmerman/sl_simulation_tools-main/filter_simba_all.py $SLURM_ARRAY_TASK_ID
+
+	date
+
+
+	# start of powderday setup bash script
+
+	#!/bin/bash
+	#SBATCH --job-name=simba_pd_setup
+	#SBATCH --output=output_pd_setup.log
+	#SBATCH --mail-type=ALL
+	#SBATCH --mail-user=[...]@ufl.edu
+	#SBATCH --ntasks=4
+	#SBATCH --nodes=1
+	#SBATCH --mem=10gb
+	#SBATCH --account=narayanan
+	#SBATCH --qos=narayanan
+	#SBATCH --time=20:00:00
+	#SBATCH --array=87
+	
+
+	#74,104,127,160,212,305 - list of snapshots that correspond to array jobs
+
+
+	date;hostname;pwd;
+	cd /home/d.zimmerman
+	module purge
+	source .bashrc
+	
+	source activate master_env
+
+	module load git/2.14.1
+	#module load gcc/8.2.0
+	module load intel/2018.1.163
+	module load openmpi/4.0.3
+	module load hdf5/1.10.1
+
+	cd /home/d.zimmerman/sl_simulation_tools-main/
+
+	python /home/d.zimmerman/sl_simulation_tools-main/galaxy_positions.py $SLURM_ARRAY_TASK_ID
+	#python /home/d.zimmerman/caesar_good_gal_script.py $SLURM_ARRAY_TASK_ID
+	python /home/d.zimmerman/sl_simulation_tools-main/powderday_setup.py $SLURM_ARRAY_TASK_ID
+	date
+
+
+The script for filtering galaxies for those with only gas is relatively simple and can be found below or at ``/home/d.zimmerman/caesar_good_gals_script.py``::
+
+	import yt
+	import caesar
+	import numpy as np
+	import sys
+	import matplotlib.pyplot as plt
+	
+	simb_run = "m100n1024" # again, which SIMBA box you care aboute
+
+	fileroot = '/orange/narayanan/d.zimmerman/simba/'+simb_run+'/caesar_cats/caesar_simba_' # where are your CAESAR files?
+	saveroot = '/orange/narayanan/d.zimmerman/simba/'+simb_run+'/snap' # where do you want this to do?
+	fileex='.hdf5'
+
+	snapnums=[127,142,160,183,212,252,305] # list of snapshots
+	num = int(sys.argv[1]) 
+	
+	#for num in snapnums: # you’ll want to comment out above and uncomment this to run this outside the above script setup
+	caes_obj = caesar.load(fileroot+str(num)+fileex)
+	gal_gasses = np.array([caes_obj.galaxies[i].masses['gas'] for i in range(len(caes_obj.galaxies))])
+	gal_index_list = np.array(range(len(gal_gasses)),dtype=int)
+	print(gal_index_list)
+	good_gals = gal_index_list[gal_gasses > 0]
+	print(good_gals)
+	test_file = open(saveroot+str(num)+"/snap"+str(num)+"_gas_gals.txt","w")
+	#for j in good_gals:
+	np.savetxt(test_file,good_gals,fmt='%s') # save info into text file
+	test_file.close()
+
+
+With that, you simply need to copy over a ``parameters_master`` file to your directories containing your automatically generated ``parameters_model`` files, and you are all set to run POWDERDAY systematically for large numbers of galaxies in a snapshot!
 
