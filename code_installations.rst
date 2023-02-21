@@ -216,7 +216,7 @@ Caesar on HiPerGator
 AREPO
 ============
 
-The current (as of August, 2022) best set of modules to compile AREPO are::
+The current best set of modules to compile AREPO for hpg2-default are::
 
   module purge
   module load intel/2018.1.163
@@ -224,9 +224,15 @@ The current (as of August, 2022) best set of modules to compile AREPO are::
   module load gsl/2.4
   module load fftw/3.3.7
 
-and then::
+
+
+Alternatively the best set of modules for hpg-default are::
+
+  module load gcc/9.3.0 openmpi/4.1.1 gsl/2.6  fftw
+
+following this::
 
   make build
-
+  
 GIZMO
 ============
