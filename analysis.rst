@@ -38,9 +38,8 @@ Projection Plots with SPHViewer
 ============
 One of the primary drawbacks to using yt is it's limited ability to plot particle datasets -- e.g., the star and dust particles that aren't acted upon by hydrodynamics and so don't have a smoothing length. Yt has a few work arounds for this issue but they remain a bit clunky. My preferred solution is to make projection plots with `sphviewer <https://github.com/alejandrobll/py-sphviewer>`_. This software is really flexible and has created some beautiul images (see, e.g., `Lovell+2021 <https://ui.adsabs.harvard.edu/abs/2021MNRAS.502..772L/abstract>`_ and `Lower+2023 <https://ui.adsabs.harvard.edu/abs/2022arXiv221202636L/abstract>`_). 
 
-Below is a handy script that generates a projection plot of the dust particles in a particular galaxy but note the code can be edited to accept any particle type or field that's in the snapshot (e.g., temperatures, SFRs, etc.):
+Below is a handy script that generates a projection plot of the dust particles in a particular galaxy but note the code can be edited to accept any particle type or field that's in the snapshot (e.g., temperatures, SFRs, etc.)::
 
-.. code-block:: python
    import sphviewer as sph                                                                                                                                                                       
    import numpy as np                                                                                                                                                                              
    import yt, caesar                                                                                                                                                                              
@@ -68,7 +67,7 @@ Below is a handy script that generates a projection plot of the dust particles i
     "xtick.major.width" : 2,
     "font.family": 'STIXGeneral',
     "mathtext.fontset" : "cm"}) 
-
+    
    #load your data                                                                                                                                                                                        
    ds = yt.load(path+f'/snapshot_{snap:03d}.hdf5')                                                                                                                                                        
    obj = caesar.load(path+f'/Groups/caesar_snapshot_{snap:03d}.hdf5')                                                                                                                                     
@@ -79,7 +78,7 @@ Below is a handy script that generates a projection plot of the dust particles i
    #note we have to do some clunky unit declaration first because the simba dust masses are indeed in code_mass but yt doesn't know that                                                                  
    dust_mass = ds.arr(ad['PartType0', 'Dust_Masses'][obj.halos[0].glist], 'code_mass').in_units('Msun').value                                                                                             
    hcoord = obj.halos[0].minpotpos.in_units('kpc').value                                                                                                                                                  
-  
+   
    extent=3 #this is like the 'width' parameter in yt projection plots                                                                                                                                    
    #this attempts to set the viewing angle with respect to the rotation axis of the galaxy disk                                                                                                         
    #but can be messed up for galaxies that are not quite disky yet                                                                                                                                        
@@ -95,13 +94,13 @@ Below is a handy script that generates a projection plot of the dust particles i
    P = sph.Particles(dust_pos*0.68, dust_mass*0.68) #factors of little h float everywhere :(                                                                                                              
    #second, sphviewer sets up a camera object, using the above viewing angle params                                                                                                                       
    #t = theta, p = phi, and are defined in spherical coordinates (i think) w.r.t the simulation box                                                                                                       
-   #r is the radial distance from the center at (x,y,z) = hcoord.                                                                                                                                         
+   #r is the radial distance from the center at (x,y,z) = hcoord.                                                                                                                           
    C = sph.Camera(x=hcoord[0]*0.68, y=hcoord[1]*0.68, z=hcoord[2]*0.68,r='infinity',t=t, p=p, roll=0, extent=[-extent,extent,-extent,extent],xsize=400, ysize=400)                                          
    #and these two actually generate the image array                                                                                                                                                       
    S = sph.Scene(P, Camera=C)                                                                                                                                                                             
    R = sph.Render(S)                                                                                                                                                                                      
    img_dust = R.get_image()                                                                                                                                                                               
-
+   
    #and plot                                                                                                                                                                                              
    vmin, vmax = 1e4, 1e9 #some educated guess as to 'good' array limits to get nice contrast in the plot                                                                                                  
    cNorm  = colors.LogNorm(vmin=vmin,vmax=vmax)                                                                                                                                                           
