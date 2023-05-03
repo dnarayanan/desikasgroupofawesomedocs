@@ -65,11 +65,11 @@ galaxies in an individual CAESAR snapshot as modified by Dhruv Zimmerman is belo
   caesar_file = '/orange/narayanan/desika.narayanan/gizmo_runs/simba/m25n512/output/Groups/caesar_0059_z7.490.hdf5'
   
   #see if the output path exists, and if not, make it
-  
-  if not os.path.exists(output_path):
-        os.makedirs(path)
-        print("creating output directory: ")+output_path
 
+  if not os.path.exists(output_path):
+        os.makedirs(output_path)
+        print("creating output directory: "+output_path)
+  
 	
   obj = caesar.load(caesar_file)
   snap_str = str(snap_num).zfill(3)
