@@ -27,81 +27,86 @@ Initial Setup Work
 ============
 
 
-Filtering Galaxies
+Filtering Galaxies [Optional]
 -----------------
 
-At this point, you hopefully have a CAESAR file to reference for galaxies for the appropriate snapshots.
-If not, refer to the CAESAR docs (https://caesar.readthedocs.io/en/latest/) for how to get that done.
-The first thing you will want to do is filter the galaxy or galaxies you would like to run POWDERDAY on. 
-This essentially entails extracting the star and gas particles from full simulation that are associated with the galaxy and copying them over to a new file with only those particles.
-This has a few very useful benefits; (1) the file sizes become significantly smaller by virtue of only needing the 
-particles necessary for radiative transfer and the ones specifically associated with the galaxy, 
-which will make it much faster to load everything and easier to not hog group space with the files, especially if you need to use a galaxy from a large box, and 
-(2) you don't need to be as careful with setting the POWDERDAY range because all potential background sources will no longer be included in the simulation file.
+At this point, you hopefully have a CAESAR file to reference for
+galaxies for the appropriate snapshots.  If not, refer to the CAESAR
+docs (https://caesar.readthedocs.io/en/latest/) for how to get that
+done.  At this point, you may wish to filter galaxies out of your
+cosmological simulation.  This technique, originally developed by Ben
+Kimock and Sidney Lower, allows you to just grab the gas and star
+particles out of the parent snapshot, and create a mini snapshot with
+just an individual galaxy in it.  (Note: this process does not
+automatically include PartType3 dust or PartType5 black holes, though
+it should be reasonably straight forward to update this as needed).
 
-The key script for filtering SIMBA simulations is (unsurprisingly) ``filter_simba.py``. This script is built to filter a single galaxy. You'll need to provide it inline with the
-path to the complete set of snapshots (i.e. the full simulation snapshot at a specific time), the specific snapshot you want, the specific galaxy number you want, and where to store
-the resulting filtered galaxy (this should always be somewhere in your folder on the group's ``/orange/narayanan/`` drive). Notably, you may also need to modify the default CAESAR
-file location if you don't want to draw from the old galaxy catalogs. My (Dhruv's) current version of the script, ``/home/d.zimmerman/sl_simulation_tools/filter_simba_all.py`` 
-has been modified to filter all the galaxies from a particular snapshot. Without the noise in the script, the essential parts of it look like this::
+The value in filtering a snapshot is that it ensures that all of the
+emission from powderday *only* comes from particles associated with
+the galaxy in CAESAR.  This helps when (e.g.) comparing physical
+properties as they would be derived from the observations with the
+true physical properties.  A script that will filter all of the
+galaxies in an individual CAESAR snapshot as modified by Dhruv Zimmerman is below::
 
-	import h5py
-	import caesar
-	import sys
-	import glob
-	import numpy as np
-	import tqdm
+  import h5py
+  import caesar
+  import sys
+  import glob
+  import numpy as np
+  import tqdm
+  import os
+  
+  ###########
+  # Line arguments
+  ###########
+  snapshot_path = '/orange/narayanan/desika.narayanan/gizmo_runs/simba/m25n512/output/snapshot_'
+  snap_num = 59
+  output_path = '/orange/narayanan/desika.narayanan/gizmo_runs/simba/m25n512/filtered_snaps/snap'+str(snap_num).zfill(3)
+  caesar_file = '/orange/narayanan/desika.narayanan/gizmo_runs/simba/m25n512/output/Groups/caesar_0059_z7.490.hdf5'
+  
+  #see if the output path exists, and if not, make it
+  
+  if not os.path.exists(output_path):
+        os.makedirs(path)
+        print("creating output directory: ")+output_path
 
-	sim = 'm100n1024' # which box you want to pull from
-	snapshot_path = '/orange/narayanan/[...]' #where is the snapshot?
-	###########
-	# Line arguments
-	###########
-	snap_num = sys.argv[1] # only input left in this version is snapshot number
-	##############
+	
+  obj = caesar.load(caesar_file)
+  snap_str = str(snap_num).zfill(3)
+  
+  input_file = h5py.File(snapshot_path+str(snap_str)+'.hdf5', 'r')
+  
 
-	output_path = '/orange/narayanan/d.zimmerman/simba/'+sim+'/snap'+str(snap_num)+'/filtered/' # where should it go?
-	ds = snapshot_path
-	caesar_file = '/orange/narayanan/d.zimmerman/simba/'+sim+'/caesar_cats/caesar_simba_'+str(snap_num)+'.hdf5' #where's your CAESAR file?
-	obj = caesar.load(caesar_file)
-
-	# holdover from naming conventions of snapshots
-	if(int(snap_num) < 100):
-	        snap_str = "0"+str(snap_num)
-	else:
-	        snap_str = str(snap_num)
-
-	input_file = h5py.File(ds+str(snap_str)+'.hdf5', 'r')
-
-	galcount = len(obj.galaxies)
-	# various modifications can be done here to not run over everything
-	for galaxy in range(galcount):
-      	  print()
-	        print("GALAXY NUM:",str(galaxy))
-	        print()
-	        glist = obj.galaxies[int(galaxy)].glist
-	        slist = obj.galaxies[int(galaxy)].slist
-
-	        with h5py.File(output_path+'galaxy_'+str(galaxy)+'.hdf5', 'w') as output_file:
-	            output_file.copy(input_file['Header'], 'Header')
-	            print('starting with gas attributes now')
-	            output_file.create_group('PartType0')
-	            for k in tqdm.tqdm(input_file['PartType0']):
-	                output_file['PartType0'][k] = input_file['PartType0'][k][:][glist]
-	            print('moving to star attributes now')
-	            output_file.create_group('PartType4')
-	            for k in tqdm.tqdm(input_file['PartType4']):
-	                output_file['PartType4'][k] = input_file['PartType4'][k][:][slist]
+  galcount = len(obj.galaxies)
+  for galaxy in range(galcount):
+        print()
+        print("GALAXY NUM:",str(galaxy))
+        print()
+        glist = obj.galaxies[int(galaxy)].glist
+        slist = obj.galaxies[int(galaxy)].slist
 
 
-	        print('done copying attributes, going to edit header now')
-	        outfile_reload = output_path+'galaxy_'+str(galaxy)+'.hdf5'
+        with h5py.File(output_path+'galaxy_'+str(galaxy)+'.hdf5', 'w') as output_file:
+            output_file.copy(input_file['Header'], 'Header')
+            print('starting with gas attributes now')
+            output_file.create_group('PartType0')
+            for k in tqdm.tqdm(input_file['PartType0']):
+                output_file['PartType0'][k] = input_file['PartType0'][k][:][glist]
+            print('moving to star attributes now')
+            output_file.create_group('PartType4')
+            for k in tqdm.tqdm(input_file['PartType4']):
+                output_file['PartType4'][k] = input_file['PartType4'][k][:][slist]
 
-	        re_out = h5py.File(outfile_reload,'r+')
-	        re_out['Header'].attrs.modify('NumPart_ThisFile', np.array([len(glist), 0, 0, 0, len(slist), 0]))
-	        re_out['Header'].attrs.modify('NumPart_Total', np.array([len(glist), 0, 0, 0, len(slist), 0]))
 
-	        re_out.close()
+        print('done copying attributes, going to edit header now')
+        outfile_reload = output_path+'galaxy_'+str(galaxy)+'.hdf5'
+
+        re_out = h5py.File(outfile_reload,'r+')
+        re_out['Header'].attrs.modify('NumPart_ThisFile', np.array([len(glist), 0, 0, 0, len(slist), 0]))
+        re_out['Header'].attrs.modify('NumPart_Total', np.array([len(glist), 0, 0, 0, len(slist), 0]))
+
+        re_out.close()
+
 
 
 
