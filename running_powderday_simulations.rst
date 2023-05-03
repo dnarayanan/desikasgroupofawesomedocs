@@ -135,12 +135,14 @@ Again, Dhruv's current version looks like this::
 	pos = {}
 	ngalaxies = {}
 	infiles = sorted(glob.glob(snap_dir+'/galaxy_*.hdf5'))
+	count = 0
 	for i in tqdm.tqdm(range(len(infiles))):
 	    try:
 	        infile = h5py.File(snap_dir+'/galaxy_'+str(i)+'.hdf5', 'r')
 	    except:
 	        print(str(i))
 	        continue
+	    count+=1
 	    pos['galaxy'+str(i)] = {}
 
 
