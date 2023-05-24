@@ -1,10 +1,15 @@
 Getting Started with Hipergator
-**********
+********************************
 
-The HiPerGator supercomputing cluster (abbreviated HPG from here on out) is our main platform for computing and sharing files. We highly encourage reading through the documentation here: <https://help.rc.ufl.edu/doc/Training>. Below we'll detail specific aspects of using hpg within our group, starting with accessing the cluster from your local computer and navigating around the various group allocations to running code and using the job scheduler. But first, a few things to note about working in a cluster environment. 
+The HiPerGator supercomputing cluster (abbreviated HPG from here on out) is our main platform for computing and sharing files. We highly encourage reading through the documentation here: `<https://help.rc.ufl.edu/doc/Training.>`_ Below we'll detail specific aspects of using hpg within our group, starting with accessing the cluster from your local computer and navigating around the various group allocations to running code and using the job scheduler.
+
+.. contents:: Section Contents 
+    :local:
+
+But first, a few things to note about working in a cluster environment. 
 
 General Things About Working in a HPC Environment
-============
+===================================================
 
 High performance computing (HPC) environments are a bit different than working locally or on a smaller server/cluster and can take a while to get used to. There's two important things to keep in mind when working with HPG::
 
@@ -19,7 +24,7 @@ duler that is in charge of allocating users' jobs to the CPUs available. This sc
 
 
 Accessing Hipergator
-============
+=====================
 
 To access hipergator from your computer, open a terminal and enter::
 
@@ -29,10 +34,10 @@ This will log you into hipergator and set you on a 'login node.' As stated above
 
 
 Running Code on Hipergator
-============
+============================
 
 Python Anaconda Environments
------------------
+------------------------------
 
 Generally it's advised to work within individual Anaconda python
 environments on HiPerGator.  The reason is that this allows you to isolate individual code builds, and if something gets screwed up, you can just delete the environment without screwing anything up. The following is taken from:

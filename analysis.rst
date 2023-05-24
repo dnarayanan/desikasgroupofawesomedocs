@@ -1,6 +1,7 @@
 Analysis Procedures
 **********
-
+.. contents:: Section Contents
+    :local:
 
 Generating SFHs from Snapshots
 ============

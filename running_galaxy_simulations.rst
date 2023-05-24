@@ -1,6 +1,7 @@
 Running Galaxy Simulations
 **********
-
+.. contents:: Section Contents
+    :local:
 
 Cosmological Simulations (Large-Box)
 ============

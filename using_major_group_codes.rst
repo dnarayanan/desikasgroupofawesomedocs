@@ -1,6 +1,9 @@
 Major Codes Used by our Group
 **********
 
+.. contents:: Section Contents
+    :local:
+
 Note --- some of these may be developed by our group, and some may
 have authors outside our group.  What follows is a quick instruction
 manual for any of these codes to get started quickly.  This is not
@@ -205,7 +208,7 @@ The behavior of slick is configured by the parameters.ini file. The following de
 
 
 
-Powderday
+Powderday (todo)
 ============
 
 

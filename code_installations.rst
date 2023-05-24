@@ -1,6 +1,7 @@
 Code Installation Notes
 **********
-
+.. contents:: Section Contents
+    :local:
 
 Powderday on HiPerGator 
 ============

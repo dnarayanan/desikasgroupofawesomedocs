@@ -1,9 +1,10 @@
 Common Software Tools and Procedures
-**********
-
+**************************************
+.. contents:: Section Contents
+    :local:
 
 Anaconda Environments
-============
+======================
 
 Using new anaconda environments for individual projects or major code
 initiatives can be super helpful, especially when testing and
