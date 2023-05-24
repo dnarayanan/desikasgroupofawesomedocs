@@ -12,17 +12,17 @@ group.
 
 .. important:: **Some helpful links**:
 
-            * Slack Group: https://desikasgroupofawesome.slack.com
-		 
-            * HiPerGator resources: https://help.rc.ufl.edu/doc/Getting_Started
+        * Slack Group: https://desikasgroupofawesome.slack.com
 
-	        * Caesar docs: https://caesar.readthedocs.org
+        * HiPerGator resources: https://help.rc.ufl.edu/doc/Getting_Started
 
-	        * powderday docs: https://powderday.readthedocs.org
+        * Caesar docs: https://caesar.readthedocs.org
 
-	        * SIMBA website: https://simba.roe.ac.uk
+        * powderday docs: https://powderday.readthedocs.org
 
-	        * Hyperion docs: https://http://docs.hyperion-rt.org/en/stable/
+        * SIMBA website: https://simba.roe.ac.uk
+
+        * Hyperion docs: https://http://docs.hyperion-rt.org/en/stable/
 
 
 .. toctree::
