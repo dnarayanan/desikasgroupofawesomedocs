@@ -1,10 +1,10 @@
 Analysis Procedures
-**********
+********************
 .. contents:: Section Contents
     :local:
 
 Generating SFHs from Snapshots
-============
+===============================
 
 (so far) There's two ways of calculating the star formation rate for simba galaxies which differ by the timescales the SFR is averaged over. The SFR calculated by caesar for galaxies is based on the current rate of star formation of the gas particles. This is an instantaneous measure of SFR -- literally, how many stars are being produced from gas particles at the moment the snapshot is written. A more general way to quantify the SFR is by averaging the stellar mass produced over some time period. This is more akin to the SFR that observers measure from galaxies, either by relating emission line luminosities to the SFR or by modeling galaxy SEDs with a SFH. Caesar does not currently calculate this SFR for us so I've written a script to do just that. 
 
@@ -25,7 +25,7 @@ The output is a pickled object containing a list of galaxy IDs and those galaxie
 
 
 Binning and plotting the SFH
---------------
+-----------------------------
 
 The list output from the above script is not immediately useful, as we need to bin those masses according to their formation times to get the SFH. This can be done tons of ways but the easiest (at least to me) way is using the scipy binned_statistic function. The code is (thankfully) documented a bit so it should be straightfoward::
 
@@ -36,7 +36,7 @@ The good thing about binning this way is that we don't have to re-run FSPS every
 
 
 Projection Plots with SPHViewer
-============
+=================================
 One of the primary drawbacks to using yt is it's limited ability to plot particle datasets -- e.g., the star and dust particles that aren't acted upon by hydrodynamics and so don't have a smoothing length. Yt has a few work arounds for this issue but they remain a bit clunky. My preferred solution is to make projection plots with `sphviewer <https://github.com/alejandrobll/py-sphviewer>`_. This software is really flexible and has created some beautiul images (see, e.g., `Lovell+2021 <https://ui.adsabs.harvard.edu/abs/2021MNRAS.502..772L/abstract>`_ and `Lower+2023 <https://ui.adsabs.harvard.edu/abs/2022arXiv221202636L/abstract>`_). 
 
 Below is a handy script that generates a projection plot of the dust particles in a particular galaxy but note the code can be edited to accept any particle type or field that's in the snapshot (e.g., temperatures, SFRs, etc.)::
@@ -118,5 +118,5 @@ Below is a handy script that generates a projection plot of the dust particles i
 
 And the resulting plot for a random high-z galaxy:
 
-.. image:: sphviewer_ex.png
+.. image:: images/sphviewer_ex.png
            :width: 600

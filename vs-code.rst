@@ -28,18 +28,22 @@ The things that I find most important are accesed from the left hand side option
 
 .. image:: images/VSCode_docs.jpg 
     :align: left 
+    :width: 60
 Explorer: where you find all your folders and files. You can open an specific folder or clone from github.
 
 .. image:: images/VSCode_github.jpg
     :align: left
+    :width: 60
 Source Control: where you can see all github (or any other source control platform) commands; you can pull, push, commit, etc.
 
 .. image:: images/VSCode_extensions.jpg
     :align: left
+    :width: 60
 Extensions: where you find other softwares and interfaces that you need to be installed in your VS Code, such as: Python, Jupyter, and Remote - SSH.
 
 .. image:: images/VSCode_settings.jpg
     :align: left
+    :width: 60
 Manage: click on this and then on "Command Palette" to access and search commands. Type "terminal" and click on the first option to open up a terminal window inside VS Code, for example.
 
 
