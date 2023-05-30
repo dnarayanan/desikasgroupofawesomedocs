@@ -30,6 +30,7 @@ group.
    :numbered:
    :maxdepth: 2
 
+   new_member_onboarding.rst
    intro_to_hpg.rst
    common_software_tools.rst
    code_installations.rst
