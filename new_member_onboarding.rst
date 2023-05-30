@@ -47,7 +47,7 @@ In our group, we use a wide variety of tools to run, analyze, and visualize our 
 
 
 So what should you be doing?
-------------------------------
+============================
 
 A good way to start is::
 
