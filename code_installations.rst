@@ -35,6 +35,7 @@ fsps::
 
   >cd $HOME
   >git clone https://github.con/cconroy20/fsps
+  >cd fsps/src
 
 in the Makefile set F90=$(FC) and this will ensure that the compilers
 `fsps <https://code.google.com/p/fsps/source/checkout>`_ uses are what
