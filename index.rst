@@ -18,11 +18,11 @@ group.
 
         * Caesar docs: https://caesar.readthedocs.org
 
-        * powderday docs: https://powderday.readthedocs.org
+        * Powderday docs: https://powderday.readthedocs.org
 
         * SIMBA website: https://simba.roe.ac.uk
 
-        * Hyperion docs: https://http://docs.hyperion-rt.org/en/stable/
+        * Hyperion docs: https://docs.hyperion-rt.org/en/stable/
 
 
 .. toctree::
