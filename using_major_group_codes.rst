@@ -208,8 +208,3 @@ The behavior of slick is configured by the parameters.ini file. The following de
 
 
 
-Powderday (todo)
-============
-
-
-
