@@ -187,11 +187,10 @@ With the above in mind and prospector and its dependencies successfully installe
     #sps = CSPSpecBasis(zcontinuous=1)
     return sps
   
-    #---------------------                                                                                                                                                                   \
-
-    # Setup Observations                                                                                                                                                                     \
-
-    #---------------------                                                                                                                                                                   \
+    #---------------------
+    # Setup Observations
+   
+    #---------------------
     
     galex = ['galex_FUV', 'galex_NUV']
     hst_wfc3_uv  = ['wfc3_uvis_f275w', 'wfc3_uvis_f336w', 'wfc3_uvis_f475w','wfc3_uvis_f555w', 'wfc3_uvis_f606w', 'wfc3_uvis_f814w']
@@ -205,12 +204,10 @@ With the above in mind and prospector and its dependencies successfully installe
     filternames = hst_wfc3_uv+hst_wfc3_ir
 
 
-    #------------------                                                                                                                                                                      \
-
-    # Build Observations                                                                                                                                                                     \
-    
-    #-------------------                                                                                                                                                                     \
-    
+  #------------------
+  # Build Observations
+  #-------------------
+  
   def build_obs(pd_dir,**kwargs):
 
     from sedpy.observate import load_filters
@@ -224,7 +221,8 @@ With the above in mind and prospector and its dependencies successfully installe
     cosmo = FlatLambdaCDM(H0=68, Om0=0.3, Tcmb0=2.725)
     m = ModelOutput(pd_dir)
     wav,flux = m.get_sed(inclination=0,aperture=-1)
-    wav  = np.asarray(wav)*u.micron #wav is in micron                                                                                                                                    \
+    wav  = np.asarray(wav)*u.micron #wav is in micron
+    
 
     wav = wav.to(u.AA)
     flux = np.asarray(flux)*u.erg/u.s
@@ -301,11 +299,10 @@ With the above in mind and prospector and its dependencies successfully installe
     #First, set some runtime parameters. These define important parameters for dynesty like how many live points (akin)
     #to emcee's walkers, and the stopping condition dlogz. We'll mostly leave these alone for now
     run_params = {'output_pickles': False, #our output will be in hdf5 format
-                  # dynesty Fitter parameters                                                                                                                                            \
-
-                  'nested_bound': 'multi',                                                                                                                                               \
-
-                  'nested_sample': 'auto',                                                                                                                                               \
+                  # dynesty Fitter parameters
+                  
+                  'nested_bound': 'multi',
+		  'nested_sample': 'auto',                                                                                                                    
 
                   'nested_nlive_init': 400,
                   'nested_nlive_batch': 200,
