@@ -1,0 +1,453 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>8. Intro to SED Fitting with Prospector &#8212; Desikas Docs 0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="9. Analysis Procedures" href="analysis.html" />
+    <link rel="prev" title="7. Running POWDERDAY Simulations" href="running_powderday_simulations.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="analysis.html" title="9. Analysis Procedures"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="running_powderday_simulations.html" title="7. Running POWDERDAY Simulations"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Desikas Docs 0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">8. </span>Intro to SED Fitting with Prospector</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="intro-to-sed-fitting-with-prospector">
+<h1><span class="section-number">8. </span>Intro to SED Fitting with Prospector<a class="headerlink" href="#intro-to-sed-fitting-with-prospector" title="Permalink to this heading">¶</a></h1>
+<p>A brief intro to SED modeling and using prospector. I cover two things in this tutorial: (1) basics of SED modeling that apply to any SED fitting code and (2) Bayesian inference (to the best of my ability).</p>
+<nav class="contents local" id="section-contents">
+<p class="topic-title">Section Contents</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#step-1-what-is-sed-fitting" id="id1">Step 1: What is SED fitting?</a></p>
+<ul>
+<li><p><a class="reference internal" href="#modeling-stellar-populations" id="id2">Modeling Stellar Populations</a></p></li>
+<li><p><a class="reference internal" href="#dust-attenuation-and-emission" id="id3">Dust Attenuation and Emission</a></p></li>
+<li><p><a class="reference internal" href="#putting-the-pieces-together" id="id4">Putting The Pieces Together</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#step-2-how-to-fit-data" id="id5">Step 2: How to fit data?</a></p></li>
+<li><p><a class="reference internal" href="#step-3-demo" id="id6">Step 3: Demo</a></p></li>
+</ul>
+</nav>
+<p>A (decently written) tutorial is available on github that walks through the basics of installing propsector and its dependencies, setting up a prospector run, and doing some analysis with the output. You can find that repo, which contains a tutorial notebook and the needed data files, here:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">smlower</span><span class="o">/</span><span class="n">prospector_tutorial</span>
+</pre></div>
+</div>
+<p>Besides the tutorial on github, the installation instructions can also be found at:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">dnarayanan</span><span class="o">/</span><span class="n">desikasgroupofawesome</span><span class="o">/</span><span class="n">blob</span><span class="o">/</span><span class="n">main</span><span class="o">/</span><span class="n">using_major_group_codes</span><span class="o">.</span><span class="n">rst</span><span class="c1">#prospector</span>
+</pre></div>
+</div>
+<section id="step-1-what-is-sed-fitting">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink"><span class="section-number">8.1. </span>Step 1: What is SED fitting?</a><a class="headerlink" href="#step-1-what-is-sed-fitting" title="Permalink to this heading">¶</a></h2>
+<p>SED modeling basically entails mapping the observed light of a galaxy at different wavelengths to their physical properties like stellar mass, star formation rate, and dust mass. There’s a bunch of different codes that do this with varying levels of sophistication: FAST, CIGALE, MAGPHYS, ProSpect, Prospector, BAGPIPES, and many, many more.</p>
+<p>To model a galaxy spectrum and infer the galaxy’s properties, there’s a bunch of assumptions we have to make about how and when the stars formed in a galaxy (the star formation history), how much and what kind of dust is in that galaxy (dust attenuation and emisision), the properties of regions like HII nebulae and AGN. For the purposes of this tutorial, we’re going to focus on just the components pertaining to stars and dust. Below is a great summary figure from Charlie Conroy’s 2013 review article on the technique of modeling stellar populations.</p>
+<a class="reference internal image-reference" href="_images/conroy_2013.png"><img alt="_images/conroy_2013.png" src="_images/conroy_2013.png" style="width: 600px;" /></a>
+<section id="modeling-stellar-populations">
+<h3><a class="toc-backref" href="#id2" role="doc-backlink"><span class="section-number">8.1.1. </span>Modeling Stellar Populations</a><a class="headerlink" href="#modeling-stellar-populations" title="Permalink to this heading">¶</a></h3>
+<p>The top row concerns modeling stellar evolution. The IMF represents the stellar mass distribution of stars in a galaxy – literally how many stars of each mass are born in a galaxy. There’s a lot of debate over what the IMF is in various regions of our own Galaxy, let alone other galaxies, but for our purposes, we just assume one of the typical distributions from the literature like Kroupa 2002 or Chabrier 2003.</p>
+<p>The isochrones are models detailing how stars move about the HR diagram as a function of time. Each line in that plot represents the distribution of stars for a fixed time. Stars that are born at the same time, but of different masses, will occupy different regions in color-magnitude space, impacting the colors of a galaxy.</p>
+<p>The right-hand plot shows spectra for a few different spectral types. Combine these three ingredients and we get something called a simple stellar population, or SSP, shown in the middle panel of the middle row. A simple stellar population represents the spectrum of a group of stars that are the same age. Think of it as taking a picture of a globular cluster: those stars formed at ~the same time but are of different masses and so the combined spectrum of that cluster will depend on how many high/low mass (hot/cold temp) stars there are and the age of that cluster.</p>
+<p>But a galaxy is definitely not just a globular cluster. It’s more of a bunch of globular clusters of different ages put together. So how do we describe that spectrum? We combine it with a model for the star formation history of the galaxy – literally, when did those globular clusters form? The left panel in the middle row shows two examples of a star formation history model (let’s ignore the bottom plot showing metallicity). SFHs of real galaxies are diverse from galaxy-to-galaxy and have different short- and long-term variability. Convolving a model for SFH with an SSP gives us a compsite stellar spectrum combining the effects of stellar spectral types and stellar age. We can see an example of this spectrum in the blue curve plotted in the bottom row.</p>
+</section>
+<section id="dust-attenuation-and-emission">
+<h3><a class="toc-backref" href="#id3" role="doc-backlink"><span class="section-number">8.1.2. </span>Dust Attenuation and Emission</a><a class="headerlink" href="#dust-attenuation-and-emission" title="Permalink to this heading">¶</a></h3>
+<p>Finally, to the shagrin of most UV and optical astronomers, a galaxy is not just stars: it also contains dust. Dust modulates the spectrum of a galaxy by absorbing the UV and optical light of stars and re-emitting that light as a blackbody in the far-infrared. This absorption (+ scattering) is called dust attenuation and is modeled with a dust attenuation curve. In the right panel of the middle row, we see an example of this where tau (optical depth) is plotted as a function of wavelength. Dust preferentially absorbs light (i.e., higher optical depths) in the UV and not as much in the red / near-IR. There’s several features to a dust attenuation curve but for now, we’ll stick with using one of the most commonly used attenuation curves in the literature: the Calzetti 2001 curve, which is shown in red in the plot. The plot right underneath shows the resulting dust emission spectra. Focusing on the peak of the curve around 100 micron, this spectrum is the result of the dust absorbing light in the UV, heating up, and re-emitting that light as a thermal blackbody. The weird features around 10 micron are the result of a special kind of dust called PAHs (polycyclic aromatic hydrocarbon) – these are fascinating but we’ll ignore them for now. The shape of the blackbody curve is dependent on the amount of dust and the dust temperature.</p>
+</section>
+<section id="putting-the-pieces-together">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink"><span class="section-number">8.1.3. </span>Putting The Pieces Together</a><a class="headerlink" href="#putting-the-pieces-together" title="Permalink to this heading">¶</a></h3>
+<p>Combining the two rows, we get a ‘composite’ galaxy spectra, including the contributions of stars of all ages and dust, shown in red in the bottom plot. This is the general shape of a galaxy SED: the stars dominate in the UV and optical while the dust emission dominates in the mid- to far-infrared.</p>
+<p>To extract information from a galaxy SED, we essentially do the above process backwards: what star and dust spectra are the best fit to the observed SED, from which we can derive the properties of the galaxy? To figure that out, we select models for the stellar evolution, star formation history, and dust. The stellar evolution models are typically fixed (i.e., we choose one model set and stick with it), but the parameters of the star formation history model and the dust attenuation/emission models can vary – this represents the basis of our MCMC problem: what combination of model parameters give us a best fit to our data? To perform this fit, we’ll use fsps+dynesty+prospector.</p>
+</section>
+</section>
+<section id="step-2-how-to-fit-data">
+<h2><a class="toc-backref" href="#id5" role="doc-backlink"><span class="section-number">8.2. </span>Step 2: How to fit data?</a><a class="headerlink" href="#step-2-how-to-fit-data" title="Permalink to this heading">¶</a></h2>
+<p>The basic idea anytime we want to fit a model to data is to literally minimize the difference between the model and the data. In its most basic form, this means generating a model SED and calculating the chi square statistic, with the ‘best fit’ model having the lowest chi square. In a more sophisticated form, this involves Bayesian inference. I’m never going to do an explanaition of Bayesian statistics justice, so if you’re super interested in learning the mechanics of this, I suggest doing outside readins. Regardless, the basis of Bayesian inference is that we have some ‘prior’ knowledge that we can use to construct the probability distribution of model parameters, which can in turn be used to construct a sort-of best fit model SED. Bayesian inference comes from Bayes theorem (which I’ll point to the wiki page for more info: <a class="reference external" href="https://en.wikipedia.org/wiki/Bayes%27_theorem">https://en.wikipedia.org/wiki/Bayes%27_theorem</a>) which says the probability distribution of a model parameter (called the posterior distribution) is related to the likelihood of that model parameter * the prior distribution of that model parameter. If you’ve ever read a paper about model fitting or listened to a colloquium about deriving properties of something from a model, this is where ‘prior,’ ‘posterior,’ and ‘likelihood’ come from.</p>
+<p>What this means in practice is that for any set of models we choose for our SED components (star formation history, dust), the model SED is evaluated based on the prior knowledge of the distribution of model parameters and the likelihood of that model parameter representing the true data. For our purposes, the likelihood function is taken care of in the internals of prospector/dynesty. Thus for each variable model parameter, we will choose a prior distribution based on our knowledge of that parameter. Literally, what are the physical or known values this model parameter can take? An example is the age of a galaxy: we know that a galaxy has to have an age greater than zero and less than the age of the universe. Now, priors can have any degree of complexity but most of the time we will use an ‘uninformative’ prior, i.e., a prior that does not impose a lot of weight on the posterior distribution of the model paramter. An example of an uninformative prior is a uniform distribution, and for the age of the galaxy, the prior would range from 0 to 14 Gyr with every value in between having equal probability within the prior space. An example of an ‘informative’ prior would be a Gaussian, where galaxy ages around the mean of the Gaussian would have greater weight than ages close to the wings. Neither prior distribution is necessarily ‘wrong,’ (and believe me, there’s tons of discussion on the intricacies of choosing priors) and generally is entirely dependent on the information/data we have and the problem we are trying to solve.</p>
+<p>Specifically for prospector, which we’ll see below, we don’t interface with the actual Bayesian inference at all, besides the initial selection of models and the choices for model priors. After the data has been fit, what we’ll have as a result are posterior distributions for each model parameter. In cases where the data is not constraining or is not fit very well, these posterior distributions will resemble the prior distributions, basically a null result. But most of the time, we’ll get back posterior distributions that resemble a Gaussian from which we can report the median value +/- the variability – this is usually what’s reported in publications. From this point, we can discuss things like maximum likelihood estimates vs. medians and degeneracies but that’s probably outside the scope of just getting started with prospector.</p>
+</section>
+<section id="step-3-demo">
+<h2><a class="toc-backref" href="#id6" role="doc-backlink"><span class="section-number">8.3. </span>Step 3: Demo</a><a class="headerlink" href="#step-3-demo" title="Permalink to this heading">¶</a></h2>
+<p>With the above in mind and prospector and its dependencies successfully installed, we’re ready to test out our setup with some data! From here, you can follow through the tutorial at <a class="reference external" href="https://github.com/smlower/prospector_tutorial/blob/main/tutorial.ipynb">https://github.com/smlower/prospector_tutorial/blob/main/tutorial.ipynb</a>, which first fits a prospector model to a toy galaxy model dataset and then fits a more ‘realistic’ galaxy SED generated by simba and powderday.   There is also example code to model the physical properties from a powderday run here.  This run uses a non-parametric SFH:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">prospect.models</span> <span class="kn">import</span> <span class="n">priors</span><span class="p">,</span> <span class="n">transforms</span> <span class="c1">#helper functions for specifying priors</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">prospect.models</span> <span class="kn">import</span> <span class="n">sedmodel</span>
+<span class="kn">from</span> <span class="nn">prospect.io</span> <span class="kn">import</span> <span class="n">write_results</span> <span class="k">as</span> <span class="n">writer</span>
+<span class="kn">from</span> <span class="nn">prospect.fitting</span> <span class="kn">import</span> <span class="n">fit_model</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+
+<span class="k">def</span> <span class="nf">find_nearest</span><span class="p">(</span><span class="n">array</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+  <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)</span><span class="o">-</span><span class="n">value</span><span class="p">))</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span>
+  <span class="k">return</span> <span class="n">idx</span>
+
+<span class="k">def</span> <span class="nf">build_model</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Function to build model components for SFH and dust.</span>
+<span class="sd">  The model params are defined by their name, whether they are a free parameter</span>
+<span class="sd">  their initial value, and their prior distribution if they are variable. The model</span>
+<span class="sd">  params are then fed to the prospector SedModel class</span>
+
+<span class="sd">  All parameters except &#39;mass&#39; correspond to fsps model parameters, the definitions of which you can find here:</span>
+<span class="sd">  https://dfm.io/python-fsps/current/stellarpop_api/</span>
+
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="n">model_params</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="c1">#redshift of galaxy -- can be a free parameter but we&#39;ll fix it for now</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;zred&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;isfree&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span><span class="s2">&quot;init&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span> <span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+  <span class="c1">#IMF model which will be used by the simple stellar population model</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;imf_type&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span><span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+  <span class="c1">#stellar mass of a galaxy -- what we&#39;re interested in! So we&#39;ll set it as a free parameter</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;logmass&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span><span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="n">priors</span><span class="o">.</span><span class="n">TopHat</span><span class="p">(</span><span class="n">mini</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">maxi</span><span class="o">=</span><span class="mi">12</span><span class="p">)})</span>
+  <span class="c1">#stellar metallicity, in units of log(Z/Z_sun)</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;logzsol&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span><span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="n">priors</span><span class="o">.</span><span class="n">TopHat</span><span class="p">(</span><span class="n">mini</span><span class="o">=-</span><span class="mf">1.6</span><span class="p">,</span> <span class="n">maxi</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)})</span>
+
+  <span class="c1">#SFH model. here, we are choosing the &#39;delayed-tau&#39; model and has two free parameters: the age and the e-folding time</span>
+  <span class="c1">#model_params.append({&#39;name&#39;: &quot;sfh&quot;, &quot;N&quot;: 1, &quot;isfree&quot;: False, &quot;init&quot;: 4, &#39;prior&#39;: None})</span>
+  <span class="c1">#age of the galaxy</span>
+  <span class="c1">#model_params.append({&#39;name&#39;: &quot;tage&quot;, &#39;N&#39;: 1, &#39;isfree&#39;: True, &#39;init&#39;: 5., &#39;units&#39;: &#39;Gyr&#39;, &#39;prior&#39;: priors.TopHat(mini=0.001, maxi=13.8)})</span>
+  <span class="c1">#e-folding time</span>
+  <span class="c1">#model_params.append({&#39;name&#39;: &quot;tau&quot;, &#39;N&#39;: 1, &#39;isfree&#39;: True,&#39;init&#39;: 1., &#39;units&#39;: &#39;Gyr&#39;, &#39;prior&#39;: priors.LogUniform(mini=0.1, maxi=30)})</span>
+
+
+  <span class="c1">#non parametric SFH</span>
+  <span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model_params</span><span class="p">]</span>
+  <span class="n">tuniv</span> <span class="o">=</span> <span class="mf">14.0</span>
+  <span class="n">nbins</span><span class="o">=</span><span class="mi">6</span>
+  <span class="n">tbinmax</span> <span class="o">=</span> <span class="p">(</span><span class="n">tuniv</span> <span class="o">*</span> <span class="mf">0.85</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e9</span>
+  <span class="n">lim1</span><span class="p">,</span> <span class="n">lim2</span> <span class="o">=</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">8.52</span> <span class="c1">#100 Myr and 330 Myr</span>
+  <span class="n">agelims</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">lim1</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lim2</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">tbinmax</span><span class="p">),</span><span class="n">nbins</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">tuniv</span><span class="o">*</span><span class="mf">1e9</span><span class="p">)]</span>
+  <span class="n">agebins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">agelims</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">agelims</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
+
+  <span class="c1">#model_params.append({&#39;name&#39;: &quot;agebins&quot;,&#39;agebins&#39;:agebins})</span>
+
+  <span class="n">ncomp</span> <span class="o">=</span> <span class="n">nbins</span>
+  <span class="n">alpha_sfh</span> <span class="o">=</span> <span class="mf">0.7</span>
+  <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">alpha_sfh</span><span class="p">,</span><span class="n">nbins</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+  <span class="n">tilde_alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">alpha</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ncomp</span><span class="p">)])</span>
+  <span class="n">zinit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ncomp</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+  <span class="n">zprior</span> <span class="o">=</span> <span class="n">priors</span><span class="o">.</span><span class="n">Beta</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">tilde_alpha</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">mini</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxi</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;sfh&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;isfree&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;init&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;mass&quot;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">,</span> <span class="s1">&#39;depends_on&#39;</span><span class="p">:</span><span class="n">zfrac_to_masses_log</span><span class="p">})</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;agebins&quot;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span><span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="p">[]})</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s2">&quot;z_fraction&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span><span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="n">priors</span><span class="o">.</span><span class="n">Beta</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">mini</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxi</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)})</span>
+
+  <span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model_params</span><span class="p">]</span>
+  <span class="n">model_params</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">)][</span><span class="s1">&#39;N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ncomp</span>
+  <span class="n">model_params</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;agebins&#39;</span><span class="p">)][</span><span class="s1">&#39;N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ncomp</span>
+  <span class="n">model_params</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;agebins&#39;</span><span class="p">)][</span><span class="s1">&#39;init&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">agebins</span><span class="o">.</span><span class="n">T</span>
+  <span class="n">model_params</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;z_fraction&#39;</span><span class="p">)][</span><span class="s1">&#39;N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">zinit</span><span class="p">)</span>
+  <span class="n">model_params</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;z_fraction&#39;</span><span class="p">)][</span><span class="s1">&#39;init&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zinit</span>
+  <span class="n">model_params</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;z_fraction&#39;</span><span class="p">)][</span><span class="s1">&#39;prior&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zprior</span>
+
+
+  <span class="c1">#model_params[n.index(&#39;massmet&#39;)][&#39;prior&#39;] = MassMet(z_mini=-1.6, z_maxi=0.2, mass_mini=8.0, mass_maxi=12.)</span>
+
+  <span class="c1">#dust attenuation model, cardelli</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;dust_type&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span><span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;mwr&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="mf">3.1</span><span class="p">,</span><span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;uvb&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span><span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+  <span class="c1">#the attenuation (in magnitudes) in the V-band</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;dust2&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span><span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="n">priors</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="n">mini</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxi</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)})</span>
+
+  <span class="c1">#for calzetti</span>
+  <span class="c1">#model_params.append({&#39;name&#39;: &#39;dust2&#39;, &#39;N&#39;: 1,&#39;isfree&#39;: True, &#39;init&#39;: 0.1,&#39;prior&#39;: priors.ClippedNormal(mini=0.0, maxi=2.0, mean=0.0, sigma=0.3)})</span>
+  <span class="c1">#dust emission model -- only 1 choice, from Draine &amp; Li 2007</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;add_dust_emission&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span><span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span>
+  <span class="c1">#mass fraction of warm dust</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;duste_gamma&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span><span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span><span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="n">priors</span><span class="o">.</span><span class="n">TopHat</span><span class="p">(</span><span class="n">mini</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxi</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)})</span>
+  <span class="c1">#minimum radiation field</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;duste_umin&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span><span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span><span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="n">priors</span><span class="o">.</span><span class="n">TopHat</span><span class="p">(</span><span class="n">mini</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">maxi</span><span class="o">=</span><span class="mf">20.0</span><span class="p">)})</span>
+  <span class="c1">#mass fraction of dust in PAHs</span>
+  <span class="n">model_params</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;duste_qpah&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;isfree&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span><span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span><span class="s1">&#39;prior&#39;</span><span class="p">:</span> <span class="n">priors</span><span class="o">.</span><span class="n">TopHat</span><span class="p">(</span><span class="n">mini</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxi</span><span class="o">=</span><span class="mf">6.0</span><span class="p">)})</span>
+
+
+  <span class="n">model</span> <span class="o">=</span> <span class="n">sedmodel</span><span class="o">.</span><span class="n">SedModel</span><span class="p">(</span><span class="n">model_params</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">model</span>
+
+
+<span class="k">def</span> <span class="nf">zfrac_to_masses_log</span><span class="p">(</span><span class="n">logmass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">z_fraction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">agebins</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">extras</span><span class="p">):</span>
+  <span class="n">sfr_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">z_fraction</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="n">sfr_fraction</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">z_fraction</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">z_fraction</span><span class="p">)):</span>
+      <span class="n">sfr_fraction</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">z_fraction</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">z_fraction</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+  <span class="n">sfr_fraction</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sfr_fraction</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+  <span class="n">time_per_bin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">agebins</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span>
+  <span class="n">mass_fraction</span> <span class="o">=</span> <span class="n">sfr_fraction</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">time_per_bin</span><span class="p">)</span>
+  <span class="n">mass_fraction</span> <span class="o">/=</span> <span class="n">mass_fraction</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+  <span class="n">masses</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">logmass</span> <span class="o">*</span> <span class="n">mass_fraction</span>
+  <span class="k">return</span> <span class="n">masses</span>
+
+
+<span class="kn">from</span> <span class="nn">prospect.sources</span> <span class="kn">import</span> <span class="n">CSPSpecBasis</span>
+<span class="k">def</span> <span class="nf">build_sps</span><span class="p">(</span><span class="n">zcontinuous</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">compute_vega_mags</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  This is our stellar population model which generates the spectra for stars of a given age and mass.</span>
+<span class="sd">  Most of the time, you aren&#39;t going to need to pay attention to this.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="kn">from</span> <span class="nn">prospect.sources</span> <span class="kn">import</span> <span class="n">FastStepBasis</span>
+  <span class="n">sps</span> <span class="o">=</span> <span class="n">FastStepBasis</span><span class="p">(</span><span class="n">zcontinuous</span><span class="o">=</span><span class="n">zcontinuous</span><span class="p">,</span>
+                      <span class="n">compute_vega_mags</span><span class="o">=</span><span class="n">compute_vega_mags</span><span class="p">)</span>
+  <span class="c1">#sps = CSPSpecBasis(zcontinuous=1)</span>
+  <span class="k">return</span> <span class="n">sps</span>
+
+  <span class="c1">#---------------------                                                                                                                                                                   \</span>
+
+  <span class="c1"># Setup Observations                                                                                                                                                                     \</span>
+
+  <span class="c1">#---------------------                                                                                                                                                                   \</span>
+
+  <span class="n">galex</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;galex_FUV&#39;</span><span class="p">,</span> <span class="s1">&#39;galex_NUV&#39;</span><span class="p">]</span>
+  <span class="n">hst_wfc3_uv</span>  <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;wfc3_uvis_f275w&#39;</span><span class="p">,</span> <span class="s1">&#39;wfc3_uvis_f336w&#39;</span><span class="p">,</span> <span class="s1">&#39;wfc3_uvis_f475w&#39;</span><span class="p">,</span><span class="s1">&#39;wfc3_uvis_f555w&#39;</span><span class="p">,</span> <span class="s1">&#39;wfc3_uvis_f606w&#39;</span><span class="p">,</span> <span class="s1">&#39;wfc3_uvis_f814w&#39;</span><span class="p">]</span>
+  <span class="n">hst_wfc3_ir</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;wfc3_ir_f105w&#39;</span><span class="p">,</span> <span class="s1">&#39;wfc3_ir_f125w&#39;</span><span class="p">,</span> <span class="s1">&#39;wfc3_ir_f140w&#39;</span><span class="p">,</span> <span class="s1">&#39;wfc3_ir_f160w&#39;</span><span class="p">]</span>
+  <span class="n">spitzer_mips</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;spitzer_mips_24&#39;</span><span class="p">]</span>
+  <span class="n">herschel_pacs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;herschel_pacs_70&#39;</span><span class="p">,</span> <span class="s1">&#39;herschel_pacs_100&#39;</span><span class="p">,</span> <span class="s1">&#39;herschel_pacs_160&#39;</span><span class="p">]</span>
+  <span class="n">herschel_spire</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;herschel_spire_250&#39;</span><span class="p">,</span> <span class="s1">&#39;herschel_spire_350&#39;</span><span class="p">,</span> <span class="s1">&#39;herschel_spire_500&#39;</span><span class="p">]</span>
+
+  <span class="n">jwst_nircam</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;jwst_f115w&#39;</span><span class="p">,</span> <span class="s1">&#39;jwst_f150w&#39;</span><span class="p">,</span> <span class="s1">&#39;jwst_f200w&#39;</span><span class="p">,</span> <span class="s1">&#39;jwst_f277w&#39;</span><span class="p">,</span> <span class="s1">&#39;jwst_f356w&#39;</span><span class="p">,</span> <span class="s1">&#39;jwst_f444w&#39;</span><span class="p">]</span>
+  <span class="n">jwst_miri</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;jwst_f560w&#39;</span><span class="p">,</span> <span class="s1">&#39;jwst_f770w&#39;</span><span class="p">,</span> <span class="s1">&#39;jwst_f1000w&#39;</span><span class="p">,</span> <span class="s1">&#39;jwst_f1280w&#39;</span><span class="p">,</span> <span class="s1">&#39;jwst_f1500w&#39;</span><span class="p">,</span> <span class="s1">&#39;jwst_f1800w&#39;</span><span class="p">,</span> <span class="s1">&#39;jwst_f2100w&#39;</span><span class="p">]</span>
+  <span class="n">filternames</span> <span class="o">=</span> <span class="n">hst_wfc3_uv</span><span class="o">+</span><span class="n">hst_wfc3_ir</span>
+
+
+  <span class="c1">#------------------                                                                                                                                                                      \</span>
+
+  <span class="c1"># Build Observations                                                                                                                                                                     \</span>
+
+  <span class="c1">#-------------------                                                                                                                                                                     \</span>
+
+<span class="k">def</span> <span class="nf">build_obs</span><span class="p">(</span><span class="n">pd_dir</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+  <span class="kn">from</span> <span class="nn">sedpy.observate</span> <span class="kn">import</span> <span class="n">load_filters</span>
+
+  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;loading obs&#39;</span><span class="p">)</span>
+  <span class="kn">import</span> <span class="nn">sedpy</span>
+  <span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+  <span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">constants</span>
+  <span class="kn">from</span> <span class="nn">astropy.cosmology</span> <span class="kn">import</span> <span class="n">FlatLambdaCDM</span>
+  <span class="kn">from</span> <span class="nn">hyperion.model</span> <span class="kn">import</span> <span class="n">ModelOutput</span>
+  <span class="n">cosmo</span> <span class="o">=</span> <span class="n">FlatLambdaCDM</span><span class="p">(</span><span class="n">H0</span><span class="o">=</span><span class="mi">68</span><span class="p">,</span> <span class="n">Om0</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">Tcmb0</span><span class="o">=</span><span class="mf">2.725</span><span class="p">)</span>
+  <span class="n">m</span> <span class="o">=</span> <span class="n">ModelOutput</span><span class="p">(</span><span class="n">pd_dir</span><span class="p">)</span>
+  <span class="n">wav</span><span class="p">,</span><span class="n">flux</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">get_sed</span><span class="p">(</span><span class="n">inclination</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">aperture</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+  <span class="n">wav</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">wav</span><span class="p">)</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">micron</span> <span class="c1">#wav is in micron                                                                                                                                    \</span>
+
+  <span class="n">wav</span> <span class="o">=</span> <span class="n">wav</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">AA</span><span class="p">)</span>
+  <span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">erg</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">s</span>
+  <span class="n">dl</span> <span class="o">=</span> <span class="n">cosmo</span><span class="o">.</span><span class="n">luminosity_distance</span><span class="p">(</span><span class="n">z_spec</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">)</span>
+  <span class="n">flux</span> <span class="o">/=</span> <span class="p">(</span><span class="mf">4.</span><span class="o">*</span><span class="mf">3.14</span><span class="o">*</span><span class="n">dl</span><span class="o">**</span><span class="mf">2.</span><span class="p">)</span>
+  <span class="n">nu</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">cgs</span><span class="o">/</span><span class="p">(</span><span class="n">wav</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">cm</span><span class="p">))</span>
+  <span class="n">nu</span> <span class="o">=</span> <span class="n">nu</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">Hz</span><span class="p">)</span>
+  <span class="n">flux</span> <span class="o">/=</span> <span class="n">nu</span>
+  <span class="n">flux</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">Jy</span><span class="p">)</span>
+  <span class="n">maggies</span> <span class="o">=</span> <span class="n">flux</span> <span class="o">/</span> <span class="mf">3631.</span>
+
+  <span class="n">filters_unsorted</span> <span class="o">=</span> <span class="n">load_filters</span><span class="p">(</span><span class="n">filternames</span><span class="p">)</span>
+  <span class="n">waves_unsorted</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">wave_mean</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">filters_unsorted</span><span class="p">]</span>
+  <span class="n">filters</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">waves_unsorted</span><span class="p">,</span><span class="n">filters_unsorted</span><span class="p">))]</span>
+  <span class="n">flx</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">flxe</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">redshifted_wav</span> <span class="o">=</span> <span class="n">wav</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">z_spec</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filters</span><span class="p">)):</span>
+      <span class="n">flux_range</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="n">wav_range</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">wavelength</span><span class="p">:</span>
+          <span class="n">flux_range</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">maggies</span><span class="p">[</span><span class="n">find_nearest</span><span class="p">(</span><span class="n">redshifted_wav</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="n">j</span><span class="p">)]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+          <span class="n">wav_range</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">redshifted_wav</span><span class="p">[</span><span class="n">find_nearest</span><span class="p">(</span><span class="n">redshifted_wav</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="n">j</span><span class="p">)]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+      <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">wav_range</span> <span class="o">*</span> <span class="n">filters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">transmission</span><span class="o">*</span> <span class="n">flux_range</span><span class="p">,</span> <span class="n">wav_range</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">wav_range</span> <span class="o">*</span> <span class="n">filters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">transmission</span><span class="p">,</span> <span class="n">wav_range</span><span class="p">)</span>
+      <span class="n">flx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="o">/</span><span class="n">b</span><span class="p">)</span>
+      <span class="n">flxe</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.03</span><span class="o">*</span> <span class="n">flx</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+  <span class="n">flx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">flx</span><span class="p">)</span>
+  <span class="n">flxe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">flxe</span><span class="p">)</span>
+  <span class="n">flux_mag</span> <span class="o">=</span> <span class="n">flx</span>
+  <span class="n">unc_mag</span> <span class="o">=</span> <span class="n">flxe</span>
+
+  <span class="n">obs</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filters</span>
+  <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;maggies&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flux_mag</span>
+  <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;maggies_unc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">unc_mag</span>
+  <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;phot_mask&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">flux_mag</span><span class="p">)</span>
+  <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;wavelength&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+  <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+  <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;pd_sed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maggies</span>
+  <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;pd_wav&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">redshifted_wav</span>
+
+  <span class="k">return</span> <span class="n">obs</span>
+
+
+<span class="k">def</span> <span class="nf">get_sfr100</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">mod</span><span class="p">):</span>
+  <span class="n">agebins</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;agebins&#39;</span><span class="p">]</span>
+  <span class="n">thetas</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">theta_labels</span><span class="p">()</span>
+  <span class="n">agebins_yrs</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">agebins</span><span class="o">.</span><span class="n">T</span>
+  <span class="n">dt</span> <span class="o">=</span> <span class="n">agebins_yrs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">agebins_yrs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+
+  <span class="n">zfrac_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">thetas</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;z_fraction&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+  <span class="n">zfrac_chain</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;chain&#39;</span><span class="p">][:,</span><span class="n">zfrac_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">zfrac_idx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+  <span class="k">try</span><span class="p">:</span>
+      <span class="n">total_mass_chain</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;chain&#39;</span><span class="p">][:,</span><span class="n">thetas</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;massmet_1&#39;</span><span class="p">)]</span>
+  <span class="k">except</span><span class="p">:</span>
+      <span class="n">total_mass_chain</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;chain&#39;</span><span class="p">][:,</span><span class="n">thetas</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;logmass&#39;</span><span class="p">)]</span>
+  <span class="n">sfr_chain</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">zfrac_chain</span><span class="p">)):</span>
+      <span class="c1">#this is the important part of this function -- it takes the proxy model parameters we sampled</span>
+      <span class="c1"># and transforms them into the masses formed in each timebin</span>
+      <span class="c1"># from there, we just divide these masses by the time in each bin to get the SFR in each bin</span>
+      <span class="n">masses_chain</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">zfrac_to_masses</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">total_mass_chain</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">zfrac_chain</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">agebins</span><span class="p">)</span>
+      <span class="n">sfr</span> <span class="o">=</span> <span class="n">masses_chain</span> <span class="o">/</span> <span class="n">dt</span>
+      <span class="n">sfr_chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sfr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+  <span class="k">return</span> <span class="n">sfr_chain</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+  <span class="n">pd_sed</span> <span class="o">=</span> <span class="s1">&#39;/orange/narayanan/s.lower/simba/pd_runs/snap305/snap305.galaxy&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;.rtout.sed&#39;</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">pd_sed</span><span class="p">)</span>
+  <span class="n">z_spec</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+
+  <span class="c1">#First, set some runtime parameters. These define important parameters for dynesty like how many live points (akin)</span>
+  <span class="c1">#to emcee&#39;s walkers, and the stopping condition dlogz. We&#39;ll mostly leave these alone for now</span>
+  <span class="n">run_params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;output_pickles&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="c1">#our output will be in hdf5 format</span>
+                <span class="c1"># dynesty Fitter parameters                                                                                                                                            \</span>
+
+                <span class="s1">&#39;nested_bound&#39;</span><span class="p">:</span> <span class="s1">&#39;multi&#39;</span><span class="p">,</span>                                                                                                                                               \
+
+                <span class="s1">&#39;nested_sample&#39;</span><span class="p">:</span> <span class="s1">&#39;auto&#39;</span><span class="p">,</span>                                                                                                                                               \
+
+                <span class="s1">&#39;nested_nlive_init&#39;</span><span class="p">:</span> <span class="mi">400</span><span class="p">,</span>
+                <span class="s1">&#39;nested_nlive_batch&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+                <span class="s1">&#39;nested_bootstrap&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s1">&#39;nested_dlogz_init&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+                <span class="s1">&#39;nested_weight_kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;pfrac&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
+            <span class="p">}</span>
+
+  <span class="n">mod</span> <span class="o">=</span> <span class="n">build_model</span><span class="p">(</span><span class="n">z_spec</span><span class="o">=</span><span class="n">z_spec</span><span class="p">)</span>
+  <span class="nb">print</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+  <span class="n">sps</span> <span class="o">=</span> <span class="n">build_sps</span><span class="p">()</span>
+  <span class="n">obs</span> <span class="o">=</span> <span class="n">build_obs</span><span class="p">(</span><span class="n">pd_sed</span><span class="p">)</span>
+  <span class="n">output</span> <span class="o">=</span> <span class="n">fit_model</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">sps</span><span class="p">,</span> <span class="o">**</span><span class="n">run_params</span><span class="p">)</span>
+
+  <span class="n">galaxy_num</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+  <span class="n">out_file</span> <span class="o">=</span> <span class="s1">&#39;outfiles/dum.uvb0.gal&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">galaxy_num</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.h5&#39;</span>
+  <span class="n">writer</span><span class="o">.</span><span class="n">write_hdf5</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">run_params</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span>
+                    <span class="n">output</span><span class="p">[</span><span class="s2">&quot;sampling&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;optimization&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">tsample</span><span class="o">=</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;sampling&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">toptimize</span><span class="o">=</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;optimization&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">8. Intro to SED Fitting with Prospector</a><ul>
+<li><a class="reference internal" href="#step-1-what-is-sed-fitting">8.1. Step 1: What is SED fitting?</a><ul>
+<li><a class="reference internal" href="#modeling-stellar-populations">8.1.1. Modeling Stellar Populations</a></li>
+<li><a class="reference internal" href="#dust-attenuation-and-emission">8.1.2. Dust Attenuation and Emission</a></li>
+<li><a class="reference internal" href="#putting-the-pieces-together">8.1.3. Putting The Pieces Together</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#step-2-how-to-fit-data">8.2. Step 2: How to fit data?</a></li>
+<li><a class="reference internal" href="#step-3-demo">8.3. Step 3: Demo</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="running_powderday_simulations.html"
+                          title="previous chapter"><span class="section-number">7. </span>Running POWDERDAY Simulations</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="analysis.html"
+                          title="next chapter"><span class="section-number">9. </span>Analysis Procedures</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/seds_with_prospector.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="analysis.html" title="9. Analysis Procedures"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="running_powderday_simulations.html" title="7. Running POWDERDAY Simulations"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Desikas Docs 0.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href=""><span class="section-number">8. </span>Intro to SED Fitting with Prospector</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, Desika Narayanan.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>
