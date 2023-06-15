@@ -612,6 +612,13 @@ We can get other physical quantities such as stellar mass much easier::
   model_thetas = mod.theta_labels()
   stellar_mass = res['chain'][:,model_thetas.index('logmass')]
 
+  #this part gets the fraction of mass that is lost to stellar
+  #evolution.  prospector simply determines the stellar mass from a sum
+  #of the final SFH, so we need to correct for mass loss
+
+  mod_50 = mod.mean_model(thetas,obs,sps)
+  mass_frac = mod_50[2]
+  stellar_mass *= mass_frac
 
 Generally, you can print the model object to see what other physical properties we can derive from the model_thetas::
 
