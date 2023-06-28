@@ -11,7 +11,7 @@ But first, a few things to note about working in a cluster environment.
 General Things About Working in a HPC Environment
 ===================================================
 
-High performance computing (HPC) environments are a bit different than working locally or on a smaller server/cluster and can take a while to get used to. There's two important things to keep in mind when working with HPG::
+High performance computing (HPC) environments are a bit different than working locally or on a smaller server/cluster and can take a while to get used to. There's two important things to keep in mind when working with HPG
 
   1. HPG relies on a 'module load' system to load libraries like compilers and other /root installed software
   2. Any work done on HPG cannot be run on a login node.
