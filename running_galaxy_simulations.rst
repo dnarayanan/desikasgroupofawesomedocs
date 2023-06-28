@@ -265,8 +265,74 @@ default is box length/particles per side/200 (in Mpc).  There's a nice
 conversation in slack about this:
 https://desikasgroupofawesome.slack.com/archives/C5HBZLSKX/p1643211197032300
 
-Beyond this, make sure the box size, cosmology, etc. are what you set
-them to in MUSIC.  Then, you should be in business to run!  This is an
+
+These things are included in the param file, which will be seperate for each simulation. You can find an example param file for a simba simulation at::
+
+
+  /orange/narayanan/s.lower/simba/m25n256_dm/zooms/track_dust_parms/run5_halo0_track_dust.param
+
+
+We'll highlight some important parts of the param file::
+
+  %---- ICs and Output
+  InitCondFile /orange/narayanan/s.lower/simba/m25n256_dm/zooms/ICs/run5_halo0_ml10
+  OutputDir /blue/narayanan/s.lower/zoom_temp/run5_halo0/
+
+  %---- File formats
+  ICFormat  1 % 1=binary, 3=hdf5, 4=cluster
+  SnapFormat 3 % 1=binary, 3=hdf5
+
+  %---- Output parameters
+  RestartFile         restart
+  SnapshotFileBase      snapshot
+  OutputListOn        1 % =1 to use list in OutputListFilename
+  OutputListFilename       /orange/narayanan/s.lower/simba/m25n256_dm/zooms/15Myr_cadence_z1p5.txt
+  NumFilesPerSnapshot     1
+  NumFilesWrittenInParallel  1 % must be < N_processors & power of 2
+
+
+The top part will point to your IC file and where you want to save the simulation snapshots. The second part specifies the format that the ICs are in and the format you want the snapshots to be in. The last part has a very important parameter called `OutputListFilename`, which sets the times (in simulation scale factor units) when the snapshots will be written. This is a pretty important scheme to choose carefully, since the science you want to do with these simulations could heavily depend on the time resolution of the snapshots (i.e., if you want to track the accretion of gas onto early halos, you'll want fine time resolution in the first billion years). The file in this example tells Gizmo to write snapshots every 15 Myr starting at z=20. If the simulation runs to z=1.5, this will output ~200 snapshots. So your choice of time resolution is also dependent on storage requirements. So keep this in mind!::
+
+  %---- Cosmological parameters
+  ComovingIntegrationOn  1    % is it cosmological? (yes=1, no=0)
+  BoxSize         25000. % in code units
+  Omega0         0.3  % =0 for non-cosmological
+  OmegaLambda       0.7  % =0 for non-cosmological
+  OmegaBaryon       0.048  % =0 for non-cosmological
+  HubbleParam       0.68   % little 'h'; =1 for non-cosmological runs
+  %---- Accuracy of time integration
+  MaxSizeTimestep     0.005  % in code units, set for your problem
+  MinSizeTimestep     1.0e-12 % set this very low, or risk stability
+  %---- Tree algorithm, force accuracy, domain update frequency
+  TreeDomainUpdateFrequency  0.005    % 0.0005-0.05, dept on core+particle number
+
+
+  %---- Gravitational softening lengths
+  %----- Softening lengths per particle type. If ADAPTIVE_GRAVSOFT is set, these
+  %-------- are the minimum softening allowed for each type -------
+  %-------- (units are co-moving for cosmological integrations)
+  SofteningGas  0.15  % gas (type=0) (in units above, =1 pc softening)
+  SofteningHalo  0.15  % dark matter/collisionless particles (type=1)
+  SofteningDisk  0.15  % collisionless particles (type=2)
+  SofteningBulge 0.15  % collisionless particles (type=3)
+  SofteningStars 0.15  % stars spawned from gas (type=4)
+  SofteningBndry 0.15  % black holes (if active), or collisionless (type=5)
+  %---- if these are set in cosmo runs, SofteningX switches from comoving to physical
+  %------- units when the comoving value exceeds the choice here
+  SofteningGasMaxPhys   0.15  % switch to 0.5pc physical below z=1
+  SofteningHaloMaxPhys  0.15
+  SofteningDiskMaxPhys  0.15
+  SofteningBulgeMaxPhys  0.15
+  SofteningStarsMaxPhys  0.15
+  SofteningBndryMaxPhys  0.15
+  %----- parameters for adaptive gravitational softening
+  AGS_DesNumNgb      64 % neighbor number for calculating adaptive gravsoft
+
+  
+Next, we need to match the boxsize and cosmology to the values used to generate the ICs. And finally, you need to adjust the softening lengths to the box size / resolution as mentioned above.
+
+
+Then, you should be in business to run!  This is an
 example from one of Sidney's zooms::
 
   [desika.narayanan@login1 zooms]$ pwd
