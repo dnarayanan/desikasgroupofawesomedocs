@@ -101,6 +101,7 @@ If your notebook does not open in your browser and your terminals says something
   channel 2: open failed: connect failed: Connection refused
 
 You may need to fix your jupyter config script. You can do that by copying mine over to your jupyter directory::
+
   cp /home/s.lower/.jupyter/jupyter_notebook_config.py $HOME/.jupyter
 
 Once copied, you’ll need to cancel the jupyter notebook job and start a new one for it to recognize the config file.
@@ -109,9 +110,11 @@ Once copied, you’ll need to cancel the jupyter notebook job and start a new on
 **Internal Service Error**
 
 This can occur when trying to open a python notebook from the localhost:8080. When this happens it is best to first try updating conda with::
+
   conda update --all
 
 Then you can continue by using pip to upgrade jupyter::
+
   pip install jupyter --upgrade
 
 If this doesn’t work, try::
