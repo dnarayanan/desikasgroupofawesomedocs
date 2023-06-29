@@ -57,16 +57,53 @@ Step 3: Demo
 =============
 With the above in mind and prospector and its dependencies successfully installed, we're ready to test out our setup with some data! From here, you can follow through the tutorial at https://github.com/smlower/prospector_tutorial/blob/main/tutorial.ipynb. The tutorial covers everything from setting up the prospector model for different SFHs, sampling photometry from the Powderday SED, and processing the output from Prospector. Included are python scripts for 1 parametric SFH model and 3 nonparametric models, plus scripts that pull the relevant results from each nonparametric SFH model including stellar mass, metallicity, SFH, and dust mass. 
 
-The tutorial notebook can be worked through without having to run Prospector as the output files are also included. The tutorial goes over how to process the output to get stellar mass and SFR, with the python script `process_prospector_output.py` combining all of the properties and model SED into pickle files for the nonparametric fit. The files included in `prospector_nonpara_SHFs` contain runtime scripts for the two other nonparametric models as well as their respective output processing scripts. These files are not tailor made for this tutorial but are useful jumping off points from which you can copy/paste the model setup for your own use (one useful thing is that these scripts were used to model z=7 simba galaxies so you can see how to set up z>0 runs since the tailor made scripts just use a z=0 galaxy). An important thing to note is that the way the output is processed for each parametric SFH is different -- so make sure to always use the corresponding output script.
+The tutorial notebook can be worked through without having to run Prospector as the output files are also included. The tutorial goes over how to process the output to get stellar mass and SFR, with the python script ``process_prospector_output.py`` combining all of the properties and model SED into pickle files for the nonparametric fit. The files included in ``prospector_nonpara_SHFs`` contain runtime scripts for the two other nonparametric models as well as their respective output processing scripts. These files are not tailor made for this tutorial but are useful jumping off points from which you can copy/paste the model setup for your own use (one useful thing is that these scripts were used to model z=7 simba galaxies so you can see how to set up z>0 runs since the tailor made scripts just use a z=0 galaxy). An important thing to note is that the way the output is processed for each parametric SFH is different -- so make sure to always use the corresponding output script.
 
 
 Additionally, there are aspects of using Prospector that are not covered in this tutorial, namely::
 
-  #. Modeling nebular emission / AGN
-  #. Using observational data and/or spectra
-  #. Using different dust attenuation models
-  #. Using custom priors (e.g., those not already baked into Prospector)
+  - Modeling nebular emission / AGN
+  - Using observational data and/or spectra
+  - Using different dust attenuation models
+  - Using custom priors (e.g., those not already baked into Prospector)
 
-However, these use-cases _are_ included in Prospector and so can be implemented by following the setups outlined on the Prospector github.
+However, these use-cases `are` included in Prospector and so can be implemented by following the setups outlined on the Prospector github.
    
+
+FAQs + Common Issues
+=============
+
+Q. How do I change the models for SFH and dust attenuation? 
+-----------------------------
+
+A. The way to tell Prospector which model you want to use is by the "sfh" and "dust_type" parameter. The value will correspond to a model choice listed at https://dfm.io/python-fsps/current/stellarpop_api/. In fact, all of the Prospector model parameters correspond to FSPS parameters, so I would highly recommend exploring the documentation page for python-fsps above. One thing to note is that each model will have different parameters to set, so make sure those parameters are decalred in your model or else they will be fixed to the default value. 
+
+
+Q. Why did my model return as ``None`` when loading the prospector results with ``pread``?
+-----------------------------
+
+A. This stems from the fact that when prospector is writing out the results to the hdf5 file, it saves the entire runtime script (i.e., your version of run_prosp.py) as plain text. Upon loading the data, ``pread`` then evaluatest that text and searches for your ``build_model`` or ``load_model`` function. As Ben Johnson and Joel Leja describe it in the prospector repo:
+
+   "This gets exactly the model object used in the fiting.
+
+    It (scarily) imports the paramfile (stored as text in the results
+    dictionary) as a module and then uses the ``load_model`` method defined in the
+    paramfile module, with ``run_params`` dictionary passed to it."
+ 
+
+So sometimes it breaks, like in cases where there's a path in somewhere in the script that python can't load. A way to get around this is to load the model yourself. Here's how I do it::
+
+
+  import sys
+  sys.path.append('/orange/narayanan/s.lower/prospector/early_massive_jwst_galaxies_labbe/psb_sfh/simba/nircam/')
+  from run_prosp import build_model
+  mod=build_model()
+
+
+Q. I have photometry or want to sample photometry from a Powderday SED but the filter is not in sedpy.
+-----------------------------
+
+A. There are two ways to rememdy this! One is to download the filter transmission for that particular instrument yourself. Just make sure it's in the format sedpy expects. The second option (and observers, cover your eyes) is to make a dummy filter yourself. I've done this for a few rest-frame FIR / submm filters because (something something interferometers are hard) those filter transmission curves are not super accessible. You can look at my (Sidney) sedpy install and see if I've already made those extra filters at ``/home/s.lower/sedpy/sedpy/data/filters``.
+
+
 
