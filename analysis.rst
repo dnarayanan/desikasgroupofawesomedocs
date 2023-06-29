@@ -356,6 +356,7 @@ First, I ran powderday imaging on a galaxy at three (rest-frame) wavelengths to 
   
 
 Here is the resulting image:
+
 .. image:: images/pd_rgb_full_res.png
            :width: 600
 
