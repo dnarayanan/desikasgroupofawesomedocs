@@ -37,7 +37,88 @@ do this?
 You can find many other options/nuances at
 https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#removing-an-environment
 , though the above should be enough to get you going.
-		
+
+
+Jupyter Notebook
+============		
+
+If you’re used to doing analysis in a notebook or GUI setting, it’s a bit tricky to work on HPG.
+Luckily it’s super easy to run Jupyter on HPG and access the notebooks on your local machine.
+Here’s how to do it, just note to replace instances of my username (s.lower) with yours wherever it shows up:
+
+
+On HPG, submit the job script below. The advantage of submitting this as a SLURM
+script vs. just submitting as an inline job on some interactive (i.e., non login node) cores
+is the notebook will stay open for up to 30 days!::
+
+  #!/bin/bash
+  #SBATCH --job-name=jnb
+  #SBATCH --output=jnb.log
+  #SBATCH --mail-type=ALL
+  #SBATCH --mail-user={your email here}
+  #SBATCH --time=30-00:00:00
+  #SBATCH --ntasks=1
+  #SBATCH --cpus-per-task=4
+  #SBATCH --nodes=1
+  #SBATCH --mem-per-cpu=3900mb
+  #SBATCH --qos=narayanan
+  #if you use a conda env, load that here
+  #source activate conda_env
+  jupyter notebook --no-browser --port=8080
+
+Save this script in a file called jnb.job, and then run it using 'sbatch jnb.job'. This script runs a jupyter notebook on HPG occupying 4 CPUs, but does not open a browser (cause HPG doesn’t have that ability). 
+
+Once this notebook is up and running do::
+
+  [s.lower@login3 ~]: squeue -u s.lower
+
+  JOBID PARTITION NAME USER ST TIME NODES NODELIST
+  2497853 hpg-milan jnb s.lower R 5:30:15 1 c0710a-s1
+  
+From this, make note of which node the job is located on. Here it's on ``c0710a-s1``. 
+
+Then, in **your local terminal**, enter::
+
+  ssh -N -L 8080:NODENAME.ufhpc:8080 s.lower@hpg2.rc.ufl.edu
+
+where ``NODENAME`` will be the name of the node above. Lastly, open whatever preferred browser you use and enter in the address bar::
+
+  localhost:8080
+
+Which will open our ssh tunnel to the Jupyter notebook hosted on HPG. If this is the first time accessing that notebook, it will ask you for a token, which you can find in the ``jnb.log`` file.
+
+
+You’ll have to do all the above shenanigans (besides debug related stuff) to start your jupyter notebook the first time (or to restart it after it runs out of time after 30 days). But during the
+next 30 days, you’ll just start from step 3 to connect to the notebook from your computer.
+
+Debugging Jupyter Notebook
+------------
+
+**Channel Open Failed**
+
+If your notebook does not open in your browser and your terminals says something like::
+
+  channel 2: open failed: connect failed: Connection refused
+
+You may need to fix your jupyter config script. You can do that by copying mine over to your jupyter directory::
+  cp /home/s.lower/.jupyter/jupyter_notebook_config.py $HOME/.jupyter
+
+Once copied, you’ll need to cancel the jupyter notebook job and start a new one for it to recognize the config file.
+
+
+**Internal Service Error**
+
+This can occur when trying to open a python notebook from the localhost:8080. When this happens it is best to first try updating conda with::
+  conda update --all
+
+Then you can continue by using pip to upgrade jupyter::
+  pip install jupyter --upgrade
+
+If this doesn’t work, try::
+
+  conda install -c conda-forge jupyter_contrib_nbextensions
+
+Hopefully one of these fixes the issue.
 
 
 Tmux
