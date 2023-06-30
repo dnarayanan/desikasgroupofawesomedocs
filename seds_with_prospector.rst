@@ -68,7 +68,11 @@ Additionally, there are aspects of using Prospector that are not covered in this
   - Using custom priors (e.g., those not already baked into Prospector)
 
 However, these use-cases `are` included in Prospector and so can be implemented by following the setups outlined on the Prospector github.
-   
+
+Attenuation Curves!!
+----------------------------
+
+Also included in the github prospector tutorial repo now is a walkthrough of how to process the output from Prospector to get the model attenuation curves for two different models. You'll find it in the notebook called ``attenuation_curves.ipynb``.    
 
 FAQs + Common Issues
 =============
