@@ -77,19 +77,17 @@ Also included in the github prospector tutorial repo now is a walkthrough of how
 FAQs + Common Issues
 =============
 
-Q. How do I change the models for SFH and dust attenuation? 
------------------------------
+**Q. How do I change the models for SFH and dust attenuation? **
 
 A. The way to tell Prospector which model you want to use is by the "sfh" and "dust_type" parameter. The value will correspond to a model choice listed at https://dfm.io/python-fsps/current/stellarpop_api/. In fact, all of the Prospector model parameters correspond to FSPS parameters, so I would highly recommend exploring the documentation page for python-fsps above. One thing to note is that each model will have different parameters to set, so make sure those parameters are decalred in your model or else they will be fixed to the default value. 
 
 
-Q. Why did my model return as ``None`` when loading the prospector results with ``pread``?
------------------------------
+**Q. Why did my model return as ``None`` when loading the prospector results with ``pread``?**
 
-A. This stems from the fact that when prospector is writing out the results to the hdf5 file, it saves the entire runtime script (i.e., your version of run_prosp.py) as plain text. Upon loading the data, ``pread`` then evaluatest that text and searches for your ``build_model`` or ``load_model`` function. As Ben Johnson and Joel Leja describe it in the prospector repo:
+A. This stems from the fact that when prospector is writing out the results to the hdf5 file, it saves the entire runtime script (i.e., your version of run_prosp.py) as plain text. Upon loading the data, ``pread`` then evaluatest that text and searches for your ``build_model`` or ``load_model`` function. As Ben Johnson and Joel Leja describe it in the prospector repo::
+
 
    "This gets exactly the model object used in the fiting.
-
     It (scarily) imports the paramfile (stored as text in the results
     dictionary) as a module and then uses the ``load_model`` method defined in the
     paramfile module, with ``run_params`` dictionary passed to it."
@@ -104,8 +102,7 @@ So sometimes it breaks, like in cases where there's a path in somewhere in the s
   mod=build_model()
 
 
-Q. I have photometry or want to sample photometry from a Powderday SED but the filter is not in sedpy.
------------------------------
+**Q. I have photometry or want to sample photometry from a Powderday SED but the filter is not in sedpy.**
 
 A. There are two ways to rememdy this! One is to download the filter transmission for that particular instrument yourself. Just make sure it's in the format sedpy expects. The second option (and observers, cover your eyes) is to make a dummy filter yourself. I've done this for a few rest-frame FIR / submm filters because (something something interferometers are hard) those filter transmission curves are not super accessible. You can look at my (Sidney) sedpy install and see if I've already made those extra filters at ``/home/s.lower/sedpy/sedpy/data/filters``.
 
