@@ -91,7 +91,7 @@ powderday::
   
 
 
-Manual Installation With Intel Compilers
+Manual Installation With Intel Compilers (updated for el8 installation by Dhruv as of 9/13/2023)
 -----------------
 
 [2] The first set of instructions for the University of Florida
@@ -101,9 +101,9 @@ the ability to use private forks of individual codes.
 
 First, load up the compilers that we'll use throughout::
 
-  >module load intel/2018.1.163
-  >module load openmpi/4.0.3
-  >module load hdf5/1.10.1
+  >module load intel/2020.0.166
+  >module load openmpi/4.1.5
+  >module load hdf5/1.14.1
   >module load git
 
 yt::
@@ -113,29 +113,26 @@ yt::
   >cd yt
   >pip install -e .
 
-
-fsps::
-
-  >cd $HOME
-  >git clone https://github.com/cconroy20/fsps
-
-in the Makefile set F90=$(FC) and this will ensure that the compilers
-`fsps <https://code.google.com/p/fsps/source/checkout>`_ uses are what
-you have module loaded.::
-  
-  >make clean
-  >make
-
-then in your .bashrc set the analog to::
-  
-  >export SPS_HOME=/Users/desika/fsps
-
-
-python fsps::
+python fsps and fsps::
 
   >cd $HOME
   >git clone --recursive https://github.com/dfm/python-fsps.git
   >cd python-fsps
+  >cd src/fsps/libfsps/src
+  >make clean
+  >make
+
+python-fsps now comes pre-packaged with fsps, so we don't need to install them separately anymore. The --recursive option on the git clone pulls the appropriate version of fsps as well. First let's compile fsps. In the Makefile set F90=$(FC) and this will ensure that the compilers
+`fsps <https://code.google.com/p/fsps/source/checkout>`_ uses are what
+you have module loaded.
+
+Set in your .bashrc the analog to::
+
+  >export SPS_HOME=$HOME/python-fsps/src/fsps/libfsps
+
+Now we can install python-fsps::
+
+  >cd $HOME/python-fsps
   >CC=icc F90=ifort python setup.py install
 
 
@@ -150,6 +147,8 @@ hyperion::
   >./configure --prefix=$HOME/local
   >make
   >make install
+
+Make sure that whatever directory you put for configure is in your $PATH. You can check whether this is true by typing $PATH in the command line and looking for the <location>/bin directory.
 
 hyperion dust::
 
