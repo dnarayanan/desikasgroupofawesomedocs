@@ -37,6 +37,7 @@ group.
    code_installations.rst
    using_major_group_codes.rst
    running_galaxy_simulations.rst
+   analyzing_galaxy_simulations.rst
    running_powderday_simulations.rst
    seds_with_prospector.rst
    analysis.rst

@@ -65,3 +65,14 @@ A good way to start is:
 #. Make sure you can run one of the example problems that ships with powderday on the HiPerGator cluster using the queue system (this last one will be much harder/more time consuming than 1-4).
 
 
+Excercises
+============================
+
+#. Powderday: successfully run the gizmo_mw_zoom powderday run that ships with the code (in pd/tests/SKIRT)
+
+#. Caesar: use a snapshot from a galaxy cosmological simulation on HiPerGator like: /orange/narayanan/desika.narayanan/gizmo runs/simba/m25n512/output/snapshot_305.hdf5 to:
+
+   #. Create a Caesar file
+   #. Plot the cumulative mass distribution functions for all of the dark matter halos in the snapshot, and the galaxies
+   #. Use the above snapshot to plot a histogram of the gas fraction (Mgas/Mstellar)
+   #. Use the above snapshot to plot a histogram of the dust to gas ratios of all the galaxies
