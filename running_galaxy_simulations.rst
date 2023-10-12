@@ -31,17 +31,14 @@ like::
   OPT     = -Wall -Wno-unknown-pragmas -O3 -g -mtune=native
   CFLAGS  =
   LFLAGS  = -lgsl -lgslcblas #-ldrfftw_threads
-  CPATHS  = -I. -I$(HPC_FFTW_INC) -I$(HPC_GSL_INC)
-  LPATHS  = -L$(HPC_FFTW_LIB) -L$(HPC_GSL_LIB)
+  CPATHS  = -I./src -I$(HOME)/local/include -I/opt/local/include -I/usr/local/include -I$(HPC_FFTW_INC) -I$(HPC_GSL_INC)
+  LPATHS  = -L$(HOME)/local/lib -L/opt/local/lib -L/usr/local/lib -L$(HPC_FFTW_LIB) -L$(HPC_GSL_LIB)
 
-So that the code automagically looks for whatever is added to your path when you module load the libraries.  In principle, you can just load modules before compiling like::
+So that the code automagically looks for whatever is added to your path when you module load the libraries.  In principle, you can just load modules before compiling like (as of 10/12/23, this is known to work for RHEL8 for music git hash 6747c54f3b73ec36719c265fd96362849a83cb45)::
 
-  module purge
-  module load intel
-  module load openmpi
-  module load gsl
-  module load hdf5
-  module load fftw
+
+
+  module load intel/2020.0.166  openmpi/4.1.5  hdf5/1.14.1 git/2.30.1  cmake/3.26.4 fftw/3.3.10  gsl/2.7 libz/1.2.11
 
 **GIZMO:** The next thing you'll need is a configuration file for MUSIC.  Let's
 set up a config file for a 25/h Mpc (side-length) and 512^3 (particle number) box.  The config file could look something like this::
@@ -137,11 +134,8 @@ Once this config file is set, we need to actually run MUSIC on the config file t
   #SBATCH --qos=narayanan-b
   
   module purge
-  module load intel
-  module load openmpi
-  module load gsl
-  module load hdf5
-  module load fftw
+
+  module load intel/2020.0.166  openmpi/4.1.5  hdf5/1.14.1 git/2.30.1  cmake/3.26.4 fftw/3.3.10  gsl/2.7 libz/1.2.11
   ./MUSIC ics_m25n512.conf
 
 and the resultant file (which we set in the .conf file to be ics_m25n512) is the HDF5 initial condition for the simulation!
