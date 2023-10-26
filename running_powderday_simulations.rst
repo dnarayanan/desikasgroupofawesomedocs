@@ -364,11 +364,11 @@ At this point, hopefully you have successfully filtered the galaxies in your CAE
 	echo "source .bashrc">>$qsubfile
 	echo "source activate master_env">>$qsubfile
 	echo -e "\n">>$qsubfile
-	echo "module load git/2.14.1">>$qsubfile
-	#echo "module load gcc/8.2.0">>$qsubfile
-	echo "module load intel/2018.1.163">>$qsubfile
-	echo "module load openmpi/4.0.3">>$qsubfile
-	echo "module load hdf5/1.10.1">>$qsubfile
+	echo "module load git">>$qsubfile
+	#echo "module load gcc/12.2.0">>$qsubfile
+	echo "module load intel/2020.0.166">>$qsubfile
+	echo "module load openmpi/4.1.5">>$qsubfile
+	echo "module load hdf5/1.14.1">>$qsubfile
 	echo -e "\n">>$qsubfile
 
 	echo "ID=\$(awk '{if(NR==(n+1)) print int(\$0)}' n=\${SLURM_ARRAY_TASK_ID} /orange/narayanan/d.zimmerman/simba/m25n512/snap${snap}/snap${snap}_gas_gals.txt)">>$qsubfile # Something Dhruv has used to only run POWDERDAY on galaxies with gas (you will need to set up the txt file if you want this), important if you are running over many galaxies in a simulation, if not, substitute subsequent ‘ID’ instances with ‘SLURM_ARRAY_TASK_ID’, which is a SLURM variable
@@ -406,11 +406,11 @@ Dhruv’s modified scripts are constructed and intended so that one can run them
 
 	source activate master_env
 
-	module load git/2.14.1
-	#module load gcc/8.2.0
-	module load intel/2018.1.163
-	module load openmpi/4.0.3
-	module load hdf5/1.10.1
+	module load git
+	#module load gcc/12.2.0
+	module load intel/2020.0.166
+	module load openmpi/4.1.5
+	module load hdf5/1.14.1
 
 	python /home/d.zimmerman/sl_simulation_tools-main/filter_simba_all.py $SLURM_ARRAY_TASK_ID
 
@@ -443,11 +443,11 @@ Dhruv’s modified scripts are constructed and intended so that one can run them
 	
 	source activate master_env
 
-	module load git/2.14.1
-	#module load gcc/8.2.0
-	module load intel/2018.1.163
-	module load openmpi/4.0.3
-	module load hdf5/1.10.1
+	module load git
+	#module load gcc/12.2.0
+	module load intel/2020.0.166
+	module load openmpi/4.1.5
+	module load hdf5/1.14.1
 
 	cd /home/d.zimmerman/sl_simulation_tools-main/
 
