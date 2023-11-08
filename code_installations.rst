@@ -219,13 +219,16 @@ AREPO
 
 The current best set of modules to compile AREPO for hpg2-default are::
 
+  
   module purge
-  module load intel/2018.1.163
-  module load openmpi/3.1.2
-  module load gsl/2.4
-  module load fftw/3.3.7
-
-
+  module load intel/2020.0.166
+  module load openmpi/4.1.5
+  module load python/3.11.4
+  module load fftw/3.3.10
+  module load hdf5/1.14.1
+  module load grackle/3.2.1
+  module load gsl/2.6
+  
 
 Alternatively the best set of modules for hpg-default are::
 
