@@ -13,7 +13,7 @@ My usual test is the SKIRT GIZMO Milky Way zoom simulation. Briefly, you'll want
 	cd powderday
 	python pd_front_end.py tests/SKIRT/gizmo_mw_zoom parameters_master_gizmo parameters_model_gizmo
 
-If all goes will, this should finish without a problem. You should also check the output SED following the POWDERDAY installation docs. 
+If all goes well, this should finish without a problem. You should also check the output SED following the POWDERDAY installation docs. 
 The 'parameters_master' file you use when running POWDERDAY will dictate exactly what important parameters you are giving to POWDERDAY (e.g. whether to have AGN on, IMF being used, etc.).
 The 'parameters_model' file includes information such as where the results will be stored, and where to find the galaxy in the simulation.
 If you're unsure about whether everything in these two files is good, post in the Slack.
