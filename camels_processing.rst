@@ -13,27 +13,33 @@ What data are available through CAMELS?
 ============
 The CAMELS simulation suite offers many data products to analyze. I'm going to give a brief overview of the data products that you are likely to use, but check out the documentation for full details (https://camels.readthedocs.io/en/latest/index.html).
 
-All CAMELS data is available through GLOBUS (more on that later). First, the raw cosmological boxes that the CAMELS team has run are accessible - most of the simulations have full snapshots available from to z=6 up to z=0. Associated with these boxes are galaxy/halo catalogs produced from various different codes' Friends-of-Friends (FOF) algorithms (CAESAR, SUBFIND, ROCKSTAR). Note that, at the time of writing, many CAESAR catalogs are missing for more recently run simulations. Some cosmology quantities (such as the power spectra) are also already available.
+All CAMELS data is available through GLOBUS (more on that later). First, the raw cosmological boxes that the CAMELS team has run are accessible - most of the simulations have full snapshots available from to z=6 up to z=0. Associated with these boxes are galaxy/halo catalogs produced from various different codes' Friends-of-Friends (FOF) algorithms (CAESAR, SUBFIND, ROCKSTAR). Note that, at the time of writing, many CAESAR catalogs are missing for more recently run simulations. Some cosmology quantities (such as the power spectra) are also already available. It's also probably worth loading https://github.com/DhruvZ/dtz_camels_workflow_scripts as many of the explanations below have some sort of example in this page and it is a self-contained workflow for using a set of CAMELS results.
 
 
 
-Initial Setup Work
+Globus 
+============
+Globus is data transfer tool that is connected to many datasets. Globus is one way to access CAMELS data - the CAMELS data is available through Globus and Hipergator is nicely set up to use Globus. Follow the UFRC HPG introductory documents for Globus if you are a first-time user and to get a sense of its uses (https://help.rc.ufl.edu/doc/Globus). You'll want to make sure you can log in, and I'd recommend you create your own guest collection following the instructions on the above intro page to whatever is the appropriate home directory for it on HPG. I'd also recommend you look up the CAMELS collection and familiarize yourself with the file structures and where everything you might want is available in the full CAMELS suite.
+
+
+Simple Globus data loading
+-----------------
+Once you're logged in, Globus has a fairly straightforward online interface to get the data you want. First, search for the 'CAMELS' collection, and it should be one of the first results. Next, selecting the 'Transfer or sync to' option will open up a second panel which you'll then want to fill in with the collection you made earlier onto the search bar. Finally, navigate and select the files on CAMELS you want and the output directory on HPG and click the 'Start' button on the CAMELS side. This will start the data transfer, which you can monitor with the 'ACTIVITY' tab on the left of the website.
+
+
+Inline Globus data loading
+-----------------
+The previous explanation discussed how you can take advantage of the intuitive setup of Globus to access CAMELS simulation results. However, it is possible that you might want to load many of these simulations simultaneously, access different parts of the original dataset, or simply just not have to leave command line in HPG to accomplish this. Globus actually does have an API for inline transfers (https://docs.globus.org/cli/reference/transfer/). You'll have to ``module load globus`` in HPG before you can use this API. The basic command structure (as shown in the above link) follows ``globus transfer [OPTIONS] SOURCE_ENDPOINT_ID[:SOURCE_PATH] DEST_ENDPOINT_ID[:DEST_PATH]``, where the IDs are hexadecimal IDs associated with Globus collections, one for CAMELS and one for your local connection. The paths refer to the paths from the root folder in both collections where you want the data to be loaded from and sent to. Personally, I recommend using a bash script to do this in a more automated and consistent way. For a reference, it might be worth starting with https://github.com/DhruvZ/dtz_camels_workflow_scripts/blob/master/camels_single_workflow/camels_bash_sim_load.sh. This is a bash script meant to load the Caesar, SUBFIND, and full simulation to different locations in the collection for a particular '1P' (the team has only varied one simulation parameter) run as pulled from a reference text file with a confirmation prompt before the actual request is sent to the Globus system. This is by no means a comprehensive script to do this and will need to be modified for your collection ID and paths, but this is a good starting point to go from that can likely be molded into what you need for your individual problem.
+
+
+
+Filtering galaxies (again)
 ============
 
+At this point, you hopefully have a loaded simulation+SUBFIND/CAESAR files depending on the simulation type. As we often do, it makes sense to try to filter these if you are running radiative transfer down the line. Again, the script at https://github.com/DhruvZ/dtz_camels_workflow_scripts/blob/master/camels_single_workflow/camels_ml_pd_setup.sh and its dependencies could serve as a starting basis for what to call for filtering. Below, I'll touch on running filtering for TNG using CAMELS from the SUBFIND catalogs since that differs noticeably from the traditional Caesar-based SIMBA filtering that we often do, and the CAMELS TNG sims and catalogs are a litte different in structure than the flagship TNG results.
 
-Filtering Galaxies [Optional]
+Filtering for CAMELS-TNG results
 -----------------
-
-At this point, you hopefully have a CAESAR file to reference for
-galaxies for the appropriate snapshots.  If not, refer to the CAESAR
-docs (https://caesar.readthedocs.io/en/latest/) for how to get that
-done.  At this point, you may wish to filter galaxies out of your
-cosmological simulation.  This technique, originally developed by Ben
-Kimock and Sidney Lower, allows you to just grab the gas and star
-particles out of the parent snapshot, and create a mini snapshot with
-just an individual galaxy in it.  (Note: this process does not
-automatically include PartType3 dust or PartType5 black holes, though
-it should be reasonably straight forward to update this as needed).
 
 The value in filtering a snapshot is that it ensures that all of the
 emission from powderday *only* comes from particles associated with
