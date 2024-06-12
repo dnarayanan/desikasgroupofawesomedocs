@@ -41,5 +41,5 @@ group.
    running_powderday_simulations.rst
    seds_with_prospector.rst
    analysis.rst
-
+   camels_processing.rst
 
