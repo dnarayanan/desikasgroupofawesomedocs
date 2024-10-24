@@ -47,6 +47,7 @@ To calculate the attenuation curve for a galaxy, we need to generate an SED with
 
 
   from hyperion.model import ModelOutput
+  from hyperion.util.integrate import integrate_loglog
   import astropy.constants as constants
   from hyperion.model import Model
   import astropy.units as u
@@ -54,7 +55,7 @@ To calculate the attenuation curve for a galaxy, we need to generate an SED with
 
   #test on a high-z Cosmic Sands galaxy
   m_out = ModelOutput('/orange/narayanan/s.lower/simba/m25n256_dm/zooms/pd_runs/run9_halo0/snap24/run9_snap024.rtout.sed')
-  wav, lum = m.get_sed(aperture=-1, inclination=0)
+  wav, lum = m_out.get_sed(aperture=-1, inclination=0)
   wave, lum = wav[::-1], lum[::-1]
 
 
