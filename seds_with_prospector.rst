@@ -9,6 +9,8 @@ A (decently written) tutorial is available on github that walks through the basi
 
   https://github.com/smlower/prospector_tutorial
 
+IMPORTANT NOTE: As of Fall 2024, an important bug in these scripts has been identified. If you are attempting to run PROSPECTOR on any SED is that not supposed to be at z=0, there is a multiplicative (1+z) term in the calculation of the flux density before the integration into the photometric filters. You can see equation 6 in this paper (https://arxiv.org/pdf/astro-ph/0210394) and its explanation, but briefly, because the units need to be flux/frequency in the observed frame, you need the 1+z term in addition to the luminosity distance calculation. See also this issue (https://github.com/bd-j/prospector/issues/356#issuecomment-2491620167) for an example of how this can affect calculations. This fork created by Dhruv in Fall 2024 (https://github.com/DhruvZ/prospector_tutorial) has these lines incorporated.
+
 Besides the tutorial on github, the installation instructions can also be found at::
 
   https://github.com/dnarayanan/desikasgroupofawesome/blob/main/using_major_group_codes.rst#prospector
