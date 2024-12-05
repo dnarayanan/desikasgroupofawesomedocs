@@ -369,16 +369,18 @@ example from one of Sidney's zooms::
 
 Compiling Arepo
 -----------------
-Arepo is similar to Gizmo with the following updates::
+Arepo is similar to Gizmo with the following updates [as of December, 2024 on HiPerGator)::
 
 
   module purge
-  module load intel/2018.1.163
-  module load openmpi/3.1.2
-  module load gsl/2.4
-  module load fftw/3.3.7
-  module list
-
+  module load ufrc
+  module load intel/2020.0.166
+  module load openmpi/4.1.6
+  module load python/3.11.4
+  module load fftw/3.3.10
+  module load hdf5/1.14.1
+  module load grackle/3.2.1
+  module load gsl/2.6
 
   
 Like with Gizmo you'll need to look at someone else's Config.sh to
@@ -531,15 +533,14 @@ as well as the GitHub repo.  An example of this .sh file (for posterity) is::
   #SBATCH --partition=hpg-default
   #SBATCH --account=narayanan
   #SBATCH --qos=narayanan
-  
+
+
   module purge
-  #module load ddt/18.0.2
-  module load intel/2018
-  module load gsl
-  module load openmpi/3.1.2
-  module load hdf5
-  #module load grackle
-  
+  module load intel/2020.0.166
+  module load gsl/2.6
+  module load openmpi/4.1.6
+  module load hdf5/1.14.1
+
   DATADIR=$SLURM_SUBMIT_DIR
   
   export OMPI_MCA_pml="ucx"
