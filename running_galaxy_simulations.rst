@@ -547,7 +547,7 @@ as well as the GitHub repo.  An example of this .sh file (for posterity) is::
   export OMPI_MCA_btl="^vader,tcp,openib"
   export OMPI_MCA_oob_tcp_listen_mode="listen_thread"
   
-  srun --mpi=pmix_v2     ./arepo_addbg/Arepo   arepo_addbg/param_MW_ultra_lowres.txt 0        1> output_makeIC/OUTPUT  2> output_makeIC/ERROR
+  srun     ./arepo_addbg/Arepo   arepo_addbg/param_MW_ultra_lowres.txt 0        1> output_makeIC/OUTPUT  2> output_makeIC/ERROR
 
 
 
