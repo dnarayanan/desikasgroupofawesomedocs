@@ -1,5 +1,5 @@
 Major Codes Used by our Group
-**********
+*****************************
 
 .. contents:: Section Contents
     :local:
@@ -86,71 +86,65 @@ The expanded tutorial on how to use Prospector can be found at::
   https://github.com/dnarayanan/desikasgroupofawesome/blob/main/seds_with_prospector.rst
 
 Slick (including Despotic)
-============
+==========================
 
 Overview
-------------------
+--------
 
 The main public repository and manual is here:
 
 https://github.com/karolinagarcia/slick
 
 
-Installing DESPOTIC
--------------------
+Installing
+----------
 
-DESPOTIC is written and maintained by Mark Krumholz (ANU), with code
-paper, repository, and manual here.  It is a fairly extensive and
-powerful code, and we recommend you read through the examples that
-ship with DESPOTIC to have at least a surface-level understanding of
-the code before embarking on SLICK.
-
-https://bitbucket.org/krumholz/despotic
-
-https://ui.adsabs.harvard.edu/abs/2014MNRAS.437.1662K/abstract
-
-
-
-Clone the DESPOTIC repository if you haven't already::
-
-  >cd $HOME
-  >git clone git@bitbucket.org:krumholz/despotic.git
-
-There are a few changes which need to be made in order to install despotic with the dependencies we have now.
-These changes can be made from a patch file::
-
-  >cd $HOME/despotic
-  >curl -L https://gist.github.com/smsutherland/11556695e210ed8ffd18e0ffbed91963/raw/ | git apply
-
-Finally install DESPOTIC using::
-
-  >python setup.py install
-
-Installing SLICK
+SLICK depends on versions of `DESPOTIC` and `CAESAR` which are not available on pypi, so we'll have to install those ourselves.
+Download these as well as SLICK itself.
 
 ::
 
-  >cd $HOME
-  >git clone https://github.com/karolinagarcia/slick.git
-  >cd slick
-  >bash ./setup.sh
-  >source $HOME/.bashrc
+  git clone git@github.com:karolinagarcia/slick.git
+  git clone git@bitbucket.org:krumholz/despotic.git
+  git clone git@github.com:dnarayanan/caesar.git
+  TODO: specify exact commits. We're not having these update under our feet anymore.
 
-Congratulations! You've now set up SLICK.
+Make a python environment for slick to exist in::
 
-The SLICK Conda Environment
-----------------------
-Create a new conda environment and install the following packages into it::
+  conda create -y --name slick python=3.10.4
+  conda activate slick
 
-  >conda create --name slick python=3.10.4
-  >conda activate slick
-  >conda install pandas=1.4.2 numpy=1.22.3 tqdm=4.64.0 astropy=5.0.4 scipy=1.7.3
-  >pip install Cython==0.29.32
+Load the compilers and modules needed by `DESPOTIC`::
 
-Install yt and caesar using the instructions in Code Installation Notes.
+  module load gcc/12.2.0 gsl/2.7
+
+We're going to install SLICK first.
+It may seem weird to do this before the dependencies, but doing so in this order allows pip to install the dependencies that *are* on pypi (numpy, yt, etc.) for us.
+
+::
+
+  cd slick
+  pip install .
+  cd ..
+
+Install `DESPOTIC`.
+Doing so requires a patch to the makefile which allows the compilers to know where gsl is located on hipergator::
+
+  cd despotic
+  TODO: sagan make a github gist with has the patch
+  curl somelink | git apply
+  python setup.py install
+  cd ..
+
+Install `CAESAR`::
+
+  cd caesar
+  python setup.py install
+
+If all has gone well, you should be able to run ``slick -h`` and get a help message.
 
 Basic Usage
-----------------------
+-----------
 
 To create a template slick project, run `slick_new.sh`. This creates [parameters.ini](#parameters-file) and `run.sh`.
 `run.sh` calls slick_frontend.sh. It assumes slick_frontend.sh is on the path, so this will need to be changed if you haven't run `setup.sh` previously.
