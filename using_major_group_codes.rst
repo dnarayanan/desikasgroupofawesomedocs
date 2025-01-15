@@ -131,8 +131,7 @@ Doing so requires a patch to the makefile which allows the compilers to know whe
 
   cd despotic
   git checkout 182cd46d
-  TODO: sagan make a github gist with has the patch
-  curl somelink | git apply
+  curl -L https://gist.githubusercontent.com/smsutherland/f12e6dac5bc91c5a227ea349dcce9098/raw/ | git apply
   python setup.py install
   cd ..
 
