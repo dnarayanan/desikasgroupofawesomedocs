@@ -107,7 +107,6 @@ Download these as well as SLICK itself.
   git clone git@github.com:karolinagarcia/slick.git
   git clone git@bitbucket.org:krumholz/despotic.git
   git clone git@github.com:dnarayanan/caesar.git
-  TODO: specify exact commits. We're not having these update under our feet anymore.
 
 Make a python environment for slick to exist in::
 
@@ -131,6 +130,7 @@ Install `DESPOTIC`.
 Doing so requires a patch to the makefile which allows the compilers to know where gsl is located on hipergator::
 
   cd despotic
+  git checkout 182cd46d
   TODO: sagan make a github gist with has the patch
   curl somelink | git apply
   python setup.py install
@@ -139,6 +139,7 @@ Doing so requires a patch to the makefile which allows the compilers to know whe
 Install `CAESAR`::
 
   cd caesar
+  git checkout da0dba1e
   python setup.py install
 
 If all has gone well, you should be able to run ``slick -h`` and get a help message.
