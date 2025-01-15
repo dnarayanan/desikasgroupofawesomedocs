@@ -99,7 +99,7 @@ https://github.com/karolinagarcia/slick
 Installing
 ----------
 
-SLICK depends on versions of `DESPOTIC` and `CAESAR` which are not available on pypi, so we'll have to install those ourselves.
+SLICK depends on versions of DESPOTIC and CAESAR which are not available on pypi, so we'll have to install those ourselves.
 Download these as well as SLICK itself.
 
 ::
@@ -113,7 +113,7 @@ Make a python environment for slick to exist in::
   conda create -y --name slick python=3.10.4
   conda activate slick
 
-Load the compilers and modules needed by `DESPOTIC`::
+Load the compilers and modules needed by DESPOTIC::
 
   module load gcc/12.2.0 gsl/2.7
 
@@ -126,7 +126,7 @@ It may seem weird to do this before the dependencies, but doing so in this order
   pip install .
   cd ..
 
-Install `DESPOTIC`.
+Install DESPOTIC.
 Doing so requires a patch to the makefile which allows the compilers to know where gsl is located on hipergator::
 
   cd despotic
@@ -136,7 +136,7 @@ Doing so requires a patch to the makefile which allows the compilers to know whe
   python setup.py install
   cd ..
 
-Install `CAESAR`::
+Install CAESAR::
 
   cd caesar
   git checkout da0dba1e
